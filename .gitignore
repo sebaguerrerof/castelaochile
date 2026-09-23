@@ -1,0 +1,51 @@
+# dependencies
+/node_modules
+/.pnpm-store
+
+# Next.js
+/.next
+/.next-*
+/out
+
+# local environment files
+.env
+.env.*
+!.env.example
+
+# Vercel project linkage and local deployment metadata
+/.vercel
+
+# temporary inspection renders
+/tmp
+
+# source photography and internal institutional material pending authorization
+/img
+/Manual de Identidad Corporativa Castelao.pdf
+/PROMPT_*.md
+/AGENTS.md
+/CLAUDE.md
+# internal documentation remains local-only
+/docs/
+
+# credentials, certificates, backups, and local reports
+*.pem
+*.key
+*.p12
+*.pfx
+*.bak
+*.backup
+/test-results
+
+# logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# TypeScript incremental cache
+*.tsbuildinfo
+
+# operating system metadata
+.DS_Store
+Thumbs.db
