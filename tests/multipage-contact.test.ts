@@ -38,15 +38,43 @@ test("legacy one-page fragments resolve to equivalent real routes", () => {
   assert.equal(getLegacyHashRoute("#inicio"), null);
 });
 
-test("WhatsApp remains safe while pending and produces a wa.me link only for valid Chilean data", () => {
+test("the official WhatsApp channel is centralized and the global action uses the valid wa.me URL", () => {
+  assert.equal(whatsappHref("+56938650977"), "https://wa.me/56938650977");
   assert.equal(whatsappHref(null), null);
   assert.equal(whatsappHref("+34 900 505 100"), null);
-  assert.equal(whatsappHref("+56 9 1234 5678"), "https://wa.me/56912345678");
 
+  const config = source("src/config/contact.ts");
   const component = source("src/components/shared/floating-whatsapp.tsx");
+  const layout = source("src/app/layout.tsx");
+
+  assert.match(config, /whatsapp: "\+56938650977"/);
+  assert.match(component, /aria-label="Contactar a Instituto Castelao Chile por WhatsApp"/);
+  assert.match(component, /target="_blank"/);
+  assert.match(component, /rel="noopener noreferrer"/);
+  assert.equal((layout.match(/<FloatingWhatsApp/g) ?? []).length, 1);
+  assert.doesNotMatch(component, /wa\.me\/null/);
+});
+
+test("the isolated fallback stays safe when WhatsApp is intentionally unavailable", () => {
+  const component = source("src/components/shared/floating-whatsapp.tsx");
+
   assert.match(component, /href="\/contacto"/);
   assert.match(component, /WhatsApp próximamente/);
-  assert.doesNotMatch(component, /wa\.me\/null/);
+});
+
+test("route, mobile-menu and FAQ motion use reusable progressive-enhancement primitives", () => {
+  const template = source("src/app/template.tsx");
+  const header = source("src/components/layout/header.tsx");
+  const accordion = source("src/components/ui/accordion.tsx");
+  const styles = source("src/app/globals.css");
+
+  assert.match(template, /PageTransition/);
+  assert.match(header, /event\.key === "Escape"/);
+  assert.match(header, /aria-current/);
+  assert.match(header, /mobile-navigation-panel--closing/);
+  assert.match(accordion, /accordion-content/);
+  assert.match(styles, /@keyframes page-enter/);
+  assert.match(styles, /@keyframes accordion-expand/);
 });
 
 test("the visible contact demonstration includes required UI without calling the contact API", () => {

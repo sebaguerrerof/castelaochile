@@ -4,8 +4,7 @@ import type { ContactConfig } from "@/types/site";
 // through the contact helpers, so no contact data is duplicated in the UI.
 export const contactConfig: ContactConfig = {
   phone: null,
-  whatsapp: null,
-  whatsappGreeting: "Hola, quisiera recibir información sobre Instituto Castelao Chile.",
+  whatsapp: "+56938650977",
   email: null,
   streetAddress: null,
   city: null,
@@ -20,5 +19,5 @@ export const contactConfig: ContactConfig = {
   },
 };
 
-/** Neutral copy shared by the floating action and the contextual contact links. */
+/** Optional prefilled copy shared by WhatsApp entry points when it is configured. */
 export const whatsappGreeting = contactConfig.whatsappGreeting;

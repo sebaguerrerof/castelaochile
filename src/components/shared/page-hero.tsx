@@ -32,12 +32,12 @@ export function PageHero({
         <Breadcrumbs current={current} />
         <div className="page-hero__grid">
           <div className="page-hero__copy">
-            <p className="eyebrow">{eyebrow}</p>
-            <h1>{title}</h1>
-            <p>{description}</p>
-            {children ? <div className="page-hero__actions">{children}</div> : null}
+            <p className="page-hero__eyebrow eyebrow">{eyebrow}</p>
+            <h1 className="page-hero__title">{title}</h1>
+            <p className="page-hero__description">{description}</p>
+            {children ? <div className="page-hero__actions page-hero__actions--motion">{children}</div> : null}
           </div>
-          <div className="page-hero__image-wrap">
+          <div className="page-hero__image-wrap page-hero__image-wrap--motion">
             <EditorialImage
               asset={image}
               className="page-hero__image"

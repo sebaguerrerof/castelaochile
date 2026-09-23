@@ -27,16 +27,13 @@ export function AccordionTrigger({
   return (
     <AccordionPrimitive.Header className="flex">
       <AccordionPrimitive.Trigger
-        className={cn(
-          "group flex min-h-16 flex-1 items-center justify-between gap-4 py-4 text-left font-heading text-lg font-bold text-foreground transition-colors hover:text-primary",
-          className,
-        )}
+        className={cn("accordion-trigger group", className)}
         {...props}
       >
         {children}
         <ChevronDown
           aria-hidden="true"
-          className="size-5 shrink-0 text-primary transition-transform duration-200 group-data-[state=open]:rotate-180 motion-reduce:transition-none"
+          className="accordion-trigger__icon size-5 shrink-0 text-primary"
         />
       </AccordionPrimitive.Trigger>
     </AccordionPrimitive.Header>
@@ -50,7 +47,7 @@ export function AccordionContent({
 }: React.ComponentProps<typeof AccordionPrimitive.Content>) {
   return (
     <AccordionPrimitive.Content
-      className="overflow-hidden text-sm text-muted-foreground data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down"
+      className="accordion-content overflow-hidden text-sm text-muted-foreground"
       {...props}
     >
       <div className={cn("pb-5 pr-10 leading-7", className)}>{children}</div>

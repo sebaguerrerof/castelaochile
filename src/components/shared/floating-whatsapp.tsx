@@ -31,7 +31,7 @@ export function FloatingWhatsApp({
 
   return (
     <a
-      aria-label="Contactar por WhatsApp"
+      aria-label="Contactar a Instituto Castelao Chile por WhatsApp"
       className="floating-whatsapp"
       data-tooltip="Contactar por WhatsApp"
       href={href}

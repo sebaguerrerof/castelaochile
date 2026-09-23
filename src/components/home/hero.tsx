@@ -14,15 +14,15 @@ export function Hero() {
       <div aria-hidden="true" className="hero-grid absolute inset-0" />
       <div aria-hidden="true" className="hero-orbit" />
       <Container className="relative grid min-h-[40rem] items-center gap-10 py-10 sm:py-14 md:grid-cols-[0.96fr_1.04fr] md:gap-8 lg:min-h-[44rem] lg:grid-cols-[0.86fr_1.14fr] lg:gap-12 lg:py-16">
-        <div className="hero-entry order-1 max-w-2xl lg:py-10">
-          <p className="eyebrow mb-5 text-primary-foreground/75">{homeContent.hero.eyebrow}</p>
-          <h1 className="max-w-3xl font-heading text-4xl font-bold tracking-[-0.05em] sm:text-6xl lg:text-[4.45rem] lg:leading-[0.98]">
+        <div className="hero-entry hero-entry--copy order-1 max-w-2xl lg:py-10">
+          <p className="hero-entry__item hero-entry__item--eyebrow eyebrow mb-5 text-primary-foreground/75">{homeContent.hero.eyebrow}</p>
+          <h1 className="hero-entry__item hero-entry__item--title max-w-3xl font-heading text-4xl font-bold tracking-[-0.05em] sm:text-6xl lg:text-[4.45rem] lg:leading-[0.98]">
             {homeContent.hero.title}
           </h1>
-          <p className="mt-6 max-w-xl text-lg leading-8 text-primary-foreground/85 sm:text-xl">
+          <p className="hero-entry__item hero-entry__item--description mt-6 max-w-xl text-lg leading-8 text-primary-foreground/85 sm:text-xl">
             {homeContent.hero.description}
           </p>
-          <div className="mt-8 flex flex-wrap gap-3">
+          <div className="hero-entry__item hero-entry__item--actions mt-8 flex flex-wrap gap-3">
             <Link
               className={buttonVariants({ variant: "inverted", size: "lg" })}
               href="/nuestro-enfoque"
