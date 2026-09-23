@@ -5,12 +5,9 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 
-import { contactConfig } from "@/config/contact";
 import { navigationItems } from "@/config/navigation";
-import { getContactActions } from "@/lib/contact-links";
 
 import { BrandLogo } from "@/components/shared/brand-logo";
-import { ContactActionLink } from "@/components/shared/contact-actions";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Container } from "./container";
@@ -20,7 +17,6 @@ export function Header() {
   const [isMenuClosing, setIsMenuClosing] = useState(false);
   const [isCompact, setIsCompact] = useState(false);
   const pathname = usePathname();
-  const primaryContactAction = getContactActions(contactConfig)[0];
   const isMenuMounted = menuRoute === pathname;
   const isOpen = isMenuMounted && !isMenuClosing;
 
@@ -107,14 +103,6 @@ export function Header() {
             })}
           </ul>
         </nav>
-
-        {primaryContactAction ? (
-          <ContactActionLink
-            action={primaryContactAction}
-            className="hidden xl:inline-flex"
-            variant="accent"
-          />
-        ) : null}
 
         <Button
           aria-controls="mobile-navigation"

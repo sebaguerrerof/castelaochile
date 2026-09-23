@@ -23,8 +23,7 @@ export function FloatingWhatsApp({
         data-tooltip="WhatsApp próximamente"
         href="/contacto"
       >
-        <WhatsAppIcon className="size-6" />
-        <span aria-hidden="true" className="floating-whatsapp__label">Próximamente</span>
+        <WhatsAppIcon className="size-7" />
       </Link>
     );
   }
@@ -38,8 +37,7 @@ export function FloatingWhatsApp({
       rel="noopener noreferrer"
       target="_blank"
     >
-      <WhatsAppIcon className="size-6" />
-      <span aria-hidden="true" className="floating-whatsapp__label">WhatsApp</span>
+      <WhatsAppIcon className="size-7" />
     </a>
   );
 }

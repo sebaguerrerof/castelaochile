@@ -59,8 +59,8 @@
   --destructive: #b42318;
   --success: #0d6840;
   --success-surface: #e7f5ed;
-  --whatsapp: #168c4b;
-  --whatsapp-hover: #127541;
+  --whatsapp: #25d366;
+  --whatsapp-hover: color-mix(in srgb, var(--whatsapp) 84%, black);
 
   --font-nav: Arial, Helvetica, sans-serif;
   --font-body: Arial, Helvetica, sans-serif;
@@ -737,15 +737,14 @@ body {
 .floating-whatsapp {
   --whatsapp-mark: #fff;
   position: fixed;
-  right: max(1rem, env(safe-area-inset-right));
-  bottom: max(1rem, env(safe-area-inset-bottom));
+  right: max(1.1rem, env(safe-area-inset-right));
+  bottom: max(1.1rem, env(safe-area-inset-bottom));
   z-index: 40;
   display: inline-flex;
-  min-width: 3.1rem;
-  min-height: 3.1rem;
+  min-width: 3.6rem;
+  min-height: 3.6rem;
   align-items: center;
   justify-content: center;
-  gap: 0.45rem;
   border: 1px solid rgb(255 255 255 / 36%);
   border-radius: 999px;
   background: var(--whatsapp);
@@ -755,18 +754,6 @@ body {
     transform var(--motion-fast) var(--ease-emphasized),
     box-shadow var(--motion-fast) var(--ease-emphasized),
     background-color var(--motion-fast) ease;
-}
-
-.floating-whatsapp__label {
-  max-width: 0;
-  overflow: hidden;
-  font-family: var(--font-nav);
-  font-size: 0.75rem;
-  font-weight: 700;
-  opacity: 0;
-  transition:
-    max-width var(--motion-base) var(--ease-emphasized),
-    opacity var(--motion-fast) ease;
 }
 
 .floating-whatsapp::after {
@@ -894,13 +881,7 @@ body {
   .floating-whatsapp:hover {
     background: var(--whatsapp-hover);
     box-shadow: 0 16px 34px rgb(0 46 24 / 36%);
-    transform: translateY(-0.2rem);
-  }
-
-  .floating-whatsapp:hover .floating-whatsapp__label,
-  .floating-whatsapp:focus-visible .floating-whatsapp__label {
-    max-width: 5rem;
-    opacity: 1;
+    transform: scale(1.08);
   }
 
   .floating-whatsapp:hover::after,
@@ -959,7 +940,6 @@ body {
   }
 
   .floating-whatsapp,
-  .floating-whatsapp__label,
   .floating-whatsapp::after {
     transition: none;
   }
@@ -1412,7 +1392,7 @@ body {
 .floating-whatsapp:focus-visible {
   background: var(--whatsapp-hover);
   box-shadow: 0 16px 34px rgb(0 46 24 / 36%);
-  transform: translateY(-0.2rem);
+  transform: scale(1.08);
 }
 
 .floating-whatsapp--preview:focus-visible {

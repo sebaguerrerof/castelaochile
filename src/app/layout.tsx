@@ -55,7 +55,11 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html className={`${ptSans.variable} ${volkhov.variable}`} lang={siteConfig.language}>
+    <html
+      className={`${ptSans.variable} ${volkhov.variable}`}
+      data-scroll-behavior="smooth"
+      lang={siteConfig.language}
+    >
       <body className="min-w-80 antialiased">
         <a className="skip-link" href="#main-content">Saltar al contenido</a>
         <Header />
