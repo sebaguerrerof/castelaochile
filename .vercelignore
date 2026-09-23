@@ -1,0 +1,16 @@
+# Upload only the files required to build and serve this Next.js review.
+/*
+
+!package.json
+!pnpm-lock.yaml
+!pnpm-workspace.yaml
+!next.config.ts
+!next-env.d.ts
+!postcss.config.mjs
+!tsconfig.json
+!src
+!src/**
+!public
+!public/**
+!vercel.json
+!.vercelignore
