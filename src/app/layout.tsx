@@ -57,8 +57,9 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html className={`${ptSans.variable} ${volkhov.variable}`} lang={siteConfig.language}>
       <body className="min-w-80 antialiased">
+        <a className="skip-link" href="#main-content">Saltar al contenido</a>
         <Header />
-        <main>{children}</main>
+        <main id="main-content">{children}</main>
         <Footer />
         <FloatingWhatsApp />
       </body>

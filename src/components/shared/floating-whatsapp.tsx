@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import { contactConfig, whatsappGreeting } from "@/config/contact";
 import { whatsappHref } from "@/lib/contact-links";
 
@@ -5,22 +7,25 @@ import { WhatsAppIcon } from "./whatsapp-icon";
 
 type FloatingWhatsAppProps = {
   whatsapp?: string | null;
-  preview?: boolean;
 };
 
-/** Renders globally only when a confirmed Chilean WhatsApp number exists. */
+/** Global action; it is intentionally useful even before the channel is confirmed. */
 export function FloatingWhatsApp({
   whatsapp = contactConfig.whatsapp,
-  preview = false,
 }: FloatingWhatsAppProps) {
   const href = whatsappHref(whatsapp, whatsappGreeting);
 
   if (!href) {
-    if (!preview) return null;
     return (
-      <span aria-label="Vista local: WhatsApp pendiente de configuración" className="floating-whatsapp floating-whatsapp--preview">
+      <Link
+        aria-label="WhatsApp próximamente. Ir a la página de contacto"
+        className="floating-whatsapp floating-whatsapp--preview"
+        data-tooltip="WhatsApp próximamente"
+        href="/contacto"
+      >
         <WhatsAppIcon className="size-6" />
-      </span>
+        <span aria-hidden="true" className="floating-whatsapp__label">Próximamente</span>
+      </Link>
     );
   }
 

@@ -17,7 +17,7 @@ export const homeContent = {
     title: "Acompañamiento en el proceso de recuperación",
     description:
       "Conoce el enfoque institucional de Instituto Castelao Chile. La información de servicios y vías de contacto se incorporará a medida que sea validada localmente.",
-    cta: { label: "Conoce nuestro enfoque", href: "#como-trabajamos" },
+    cta: { label: "Conoce nuestro enfoque", href: "/nuestro-enfoque" },
   },
   about: {
     eyebrow: "Instituto",

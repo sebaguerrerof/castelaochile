@@ -1,7 +1,9 @@
+import Link from "next/link";
+
 import { contactConfig } from "@/config/contact";
 import { navigationItems } from "@/config/navigation";
 import { siteConfig } from "@/config/site";
-import { getContactActions, whatsappHref } from "@/lib/contact-links";
+import { getContactActions } from "@/lib/contact-links";
 import { homeContent } from "@/content/home";
 import { cn } from "@/lib/utils";
 
@@ -16,7 +18,7 @@ export function Footer() {
     <footer
       className={cn(
         "border-t border-primary/20 bg-primary py-12 text-primary-foreground",
-        whatsappHref(contactConfig.whatsapp) && "pb-28",
+        "pb-28",
       )}
     >
       <Container>
@@ -31,12 +33,12 @@ export function Footer() {
             <ul className="grid grid-cols-2 gap-x-4 gap-y-3 lg:grid-cols-3">
               {navigationItems.map((item) => (
                 <li key={item.href}>
-                  <a
+                  <Link
                     className="font-nav text-xs font-bold uppercase tracking-[0.08em] text-primary-foreground/85 transition-colors hover:text-primary-foreground"
                     href={item.href}
                   >
                     {item.label}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>

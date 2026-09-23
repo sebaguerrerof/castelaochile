@@ -14,8 +14,11 @@ export type ValueCardContent = {
   icon: LucideIcon;
 };
 
+export type FaqTopic = "sitio" | "contacto" | "orientacion";
+
 export type FaqItem = {
   id: string;
+  topic: FaqTopic;
   question: string;
   answer: string;
   approval: "editorial" | "pending-validation";

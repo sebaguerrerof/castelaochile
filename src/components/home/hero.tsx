@@ -1,51 +1,42 @@
-import { ArrowDownRight } from "lucide-react";
+import { ArrowDownRight, ArrowUpRight } from "lucide-react";
+import Link from "next/link";
 
 import { assets } from "@/config/assets";
-import { contactConfig } from "@/config/contact";
 import { homeContent } from "@/content/home";
-import { getContactActions } from "@/lib/contact-links";
-import { getContactFormMode } from "@/lib/server/contact-runtime";
 
-import { LinkButton } from "@/components/ui/button";
 import { Container } from "@/components/layout/container";
-import { ContactActionLink } from "@/components/shared/contact-actions";
 import { EditorialImage } from "@/components/shared/editorial-image";
+import { buttonVariants } from "@/components/ui/button";
 
 export function Hero() {
-  const primaryContactAction = getContactActions(contactConfig)[0];
-  const contactFormIsActive = getContactFormMode() === "active";
-
   return (
     <section className="hero-scene relative isolate overflow-hidden text-primary-foreground" id="inicio">
       <div aria-hidden="true" className="hero-grid absolute inset-0" />
       <div aria-hidden="true" className="hero-orbit" />
       <Container className="relative grid min-h-[40rem] items-center gap-10 py-10 sm:py-14 md:grid-cols-[0.96fr_1.04fr] md:gap-8 lg:min-h-[44rem] lg:grid-cols-[0.86fr_1.14fr] lg:gap-12 lg:py-16">
         <div className="hero-entry order-1 max-w-2xl lg:py-10">
-          <p className="eyebrow mb-5 text-primary-foreground/75">
-            {homeContent.hero.eyebrow}
-          </p>
+          <p className="eyebrow mb-5 text-primary-foreground/75">{homeContent.hero.eyebrow}</p>
           <h1 className="max-w-3xl font-heading text-4xl font-bold tracking-[-0.05em] sm:text-6xl lg:text-[4.45rem] lg:leading-[0.98]">
             {homeContent.hero.title}
           </h1>
           <p className="mt-6 max-w-xl text-lg leading-8 text-primary-foreground/85 sm:text-xl">
             {homeContent.hero.description}
           </p>
-          {primaryContactAction ? (
-            <ContactActionLink
-              action={primaryContactAction}
-              className="mt-8"
-              variant="inverted"
-            />
-          ) : (
-            <LinkButton
-              className="mt-8 bg-primary-foreground text-primary hover:bg-primary-foreground/90"
-              href={contactFormIsActive ? "#contacto" : homeContent.hero.cta.href}
-              size="lg"
+          <div className="mt-8 flex flex-wrap gap-3">
+            <Link
+              className={buttonVariants({ variant: "inverted", size: "lg" })}
+              href="/nuestro-enfoque"
             >
-              {contactFormIsActive ? "Escríbenos" : homeContent.hero.cta.label}
+              {homeContent.hero.cta.label}
               <ArrowDownRight aria-hidden="true" className="size-5" />
-            </LinkButton>
-          )}
+            </Link>
+            <Link
+              className="button-motion inline-flex min-h-12 items-center gap-2 rounded-full border border-primary-foreground/45 px-6 py-3 font-nav text-sm font-bold tracking-[0.04em] text-primary-foreground hover:bg-primary-foreground/10"
+              href="/contacto"
+            >
+              Ver contacto <ArrowUpRight aria-hidden="true" className="size-4" />
+            </Link>
+          </div>
         </div>
         <div className="hero-entry hero-entry--delayed order-2 md:justify-self-end">
           <div className="hero-image-shell">
@@ -60,9 +51,9 @@ export function Hero() {
             <p className="hero-image-shell__caption">Espacios para estar y conversar</p>
           </div>
         </div>
-        <a className="hero-scroll-cue hidden md:flex" href="#instituto">
+        <Link className="hero-scroll-cue hidden md:flex" href="/instituto">
           <span aria-hidden="true" /> Descubre el instituto
-        </a>
+        </Link>
       </Container>
     </section>
   );

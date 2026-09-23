@@ -17,7 +17,7 @@ export type ContactConfig = {
 };
 
 export type NavigationItem = {
-  href: `#${string}`;
+  href: "/" | `/${string}`;
   label: string;
 };
 
