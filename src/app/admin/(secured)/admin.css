@@ -1,0 +1,38 @@
+.admin-shell { min-height: 100dvh; display: grid; grid-template-columns: 17rem minmax(0, 1fr); background: #f4f8fb; color: #102a43; }
+.admin-sidebar { background: #082f49; color: #eaf6ff; display: flex; flex-direction: column; padding: 1.5rem; gap: 2rem; }
+.admin-brand { color: inherit; font-family: var(--font-volkhov); font-size: 1.15rem; text-decoration: none; }
+.admin-brand span { display: block; color: #9bd6fa; font-family: var(--font-pt-sans); font-size: .78rem; margin-top: .3rem; text-transform: uppercase; letter-spacing: .08em; }
+.admin-navigation { display: grid; gap: .35rem; }
+.admin-navigation a { border-radius: .5rem; color: inherit; padding: .65rem .7rem; text-decoration: none; }
+.admin-navigation a:hover, .admin-navigation a:focus-visible { background: #0d4a6c; }
+.admin-account { border-top: 1px solid #28617f; display: grid; gap: .3rem; margin-top: auto; padding-top: 1rem; font-size: .82rem; overflow-wrap: anywhere; }
+.admin-account small { color: #9bd6fa; text-transform: capitalize; }
+.admin-account button { background: transparent; border: 1px solid #7cc6ee; border-radius: .4rem; color: #eaf6ff; cursor: pointer; margin-top: .5rem; padding: .45rem .6rem; text-align: left; }
+.admin-main { margin: 0 auto; max-width: 82rem; min-width: 0; padding: 2rem; width: 100%; }
+.admin-page-header { align-items: flex-start; display: flex; gap: 1rem; justify-content: space-between; margin-bottom: 1.75rem; }
+.admin-page-header h1 { font-family: var(--font-volkhov); font-size: clamp(1.85rem, 4vw, 2.7rem); margin: .25rem 0; }
+.admin-page-header p { color: #486581; margin: 0; max-width: 50rem; }
+.admin-panel, .admin-stat { background: #fff; border: 1px solid #d9e2ec; border-radius: .8rem; box-shadow: 0 4px 16px #102a4310; padding: 1.1rem; }
+.admin-stat-grid { display: grid; gap: 1rem; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.admin-stat strong { display: block; font-size: 2rem; margin-top: .35rem; }
+.admin-stat span { color: #486581; font-size: .85rem; }
+.admin-grid { display: grid; gap: 1rem; grid-template-columns: repeat(2, minmax(0, 1fr)); margin-top: 1rem; }
+.admin-table-wrap { overflow-x: auto; }
+.admin-table { border-collapse: collapse; min-width: 38rem; width: 100%; }
+.admin-table th, .admin-table td { border-bottom: 1px solid #d9e2ec; padding: .75rem .5rem; text-align: left; vertical-align: top; }
+.admin-table th { color: #486581; font-size: .78rem; text-transform: uppercase; }
+.admin-table a { color: #0079be; font-weight: 700; }
+.admin-status { border-radius: 99px; display: inline-block; font-size: .78rem; padding: .22rem .5rem; background: #e8f5fd; color: #075985; }
+.admin-form { display: grid; gap: 1rem; max-width: 52rem; }
+.admin-form label, .admin-login-form label { display: grid; font-weight: 700; gap: .35rem; }
+.admin-form input, .admin-form textarea, .admin-form select, .admin-login-form input { border: 1px solid #9fb3c8; border-radius: .45rem; font: inherit; padding: .65rem; width: 100%; }
+.admin-form textarea { min-height: 14rem; resize: vertical; }
+.admin-form button, .admin-login-form button, .admin-page-header a, .admin-runtime-unavailable a { background: #0079be; border: 0; border-radius: .45rem; color: #fff; cursor: pointer; display: inline-block; font-weight: 700; padding: .7rem 1rem; text-decoration: none; width: fit-content; }
+.admin-form-error { background: #fff1f2; border: 1px solid #fecdd3; border-radius: .5rem; color: #9f1239; padding: .75rem; }
+.admin-login-page, .admin-runtime-unavailable { align-items: center; background: #f4f8fb; display: grid; min-height: 100dvh; padding: 1.5rem; place-items: center; }
+.admin-login-page section, .admin-runtime-unavailable { background: #fff; border: 1px solid #d9e2ec; border-radius: 1rem; max-width: 32rem; padding: clamp(1.5rem, 5vw, 3rem); }
+.admin-login-form { display: grid; gap: 1rem; margin-top: 1.5rem; }
+.admin-login-form p { color: #486581; font-size: .9rem; margin: 0; }
+.admin-runtime-unavailable { align-content: center; justify-items: start; }
+.admin-runtime-unavailable h1 { font-family: var(--font-volkhov); }
+@media (max-width: 760px) { .admin-shell { grid-template-columns: 1fr; } .admin-sidebar { gap: 1rem; } .admin-navigation { display: flex; flex-wrap: wrap; } .admin-account { margin-top: 0; } .admin-main { padding: 1.25rem; } .admin-stat-grid, .admin-grid { grid-template-columns: 1fr; } .admin-page-header { flex-direction: column; } }
