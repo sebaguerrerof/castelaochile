@@ -114,11 +114,12 @@ Ninguno. Se reutilizaron React 19, Next.js 16, Lucide, Supabase y la infraestruc
 
 ## QA
 
-- Despliegue productivo, migración remota y push de la rama `feature/admin-supabase-cms`: autorizados explícitamente el 29/09/2026. Supabase y Vercel completados; commit/push Git en curso.
+- Despliegue productivo, migración remota y push de la rama `feature/admin-supabase-cms`: completados con autorización explícita el 29/09/2026.
 - Supabase producción: migración `20260929131909` aplicada; historial local/remoto alineado, dos políticas SELECT de `content_posts` verificadas, trigger del último superadministrador activo, 1 superadministrador activo y lint sin errores.
 - Supabase Auth producción: protección contra contraseñas filtradas cambió de desactivada a activada mediante una actualización puntual; no se ejecutó `config push` para preservar URLs, MFA, SMTP y demás ajustes remotos.
 - Vercel producción: build remoto aprobado con Next.js `16.3.5`, 18 páginas estáticas y todas las rutas administrativas compiladas; el deployment quedó asociado a `https://castelaochile.vercel.app`.
 - Smoke tests productivos: `/`, `/admin/login` y `/admin/activar` respondieron `200`; `/admin` respondió `307` hacia `/admin/login`; la CSP productiva no contiene `'unsafe-eval'` y `X-Robots-Tag` conserva `noindex, nofollow, noarchive`.
+- Git: commit productivo `5570529` (`feat: redesign admin and harden production security`) publicado en `origin/feature/admin-supabase-cms`; no se hizo merge a `main`.
 - Preview branch temporal `codex-admin-rls-qa-20260929` creada sin datos de producción y sin persistencia para validar primero la migración; fue eliminada antes del despliegue al proyecto principal.
 - pgTAP en preview: aprobado, 33/33. Se ejecutó mediante la API de administración en una única transacción con `ROLLBACK`, porque `supabase test db` requiere Docker aun cuando se apunta a una base remota.
 - `supabase db lint` en preview: aprobado, sin errores de esquema.
@@ -147,4 +148,4 @@ Ninguno. Se reutilizaron React 19, Next.js 16, Lucide, Supabase y la infraestruc
 
 ## Próximo paso recomendado
 
-Completar el commit y push Git de la rama `feature/admin-supabase-cms`. Después queda como siguiente iteración la auditoría autenticada de accesibilidad y responsive con una sesión administrativa autorizada.
+Realizar la auditoría autenticada de accesibilidad y responsive de las vistas protegidas con una sesión administrativa autorizada; el código, Supabase, Vercel y la rama remota ya están publicados.
