@@ -3,6 +3,8 @@
 import { useState } from "react";
 
 import { deleteContentPost, saveContentPost } from "@/app/admin/(secured)/actions";
+import { AdminActionForm } from "@/components/admin/admin-action-form";
+import { AdminSubmitButton } from "@/components/admin/admin-submit-button";
 import { createBrowserSupabaseClient } from "@/lib/supabase/browser";
 import type { Database } from "@/types/database";
 
@@ -44,26 +46,26 @@ export function ContentEditor({ post, userId, canDelete }: { post: EditablePost 
 
   return (
     <>
-      <form action={saveContentPost} className="admin-form">
+      <AdminActionForm action={saveContentPost} className="admin-form">
         <input name="id" type="hidden" value={post?.id ?? ""} />
-        <label>Tipo<select defaultValue={post?.kind ?? "blog"} name="kind"><option value="blog">Blog</option><option value="news">Noticia</option></select></label>
-        <label>Título<input defaultValue={post?.title ?? ""} maxLength={160} name="title" onChange={(event) => { if (!post) setSlug(slugify(event.currentTarget.value)); }} required /></label>
-        <label>Slug<input maxLength={160} name="slug" onChange={(event) => setSlug(slugify(event.currentTarget.value))} pattern="[a-z0-9]+(-[a-z0-9]+)*" required value={slug} /></label>
-        <label>Resumen<input defaultValue={post?.summary ?? ""} maxLength={320} minLength={10} name="summary" required /></label>
-        <label>Contenido (Markdown seguro, sin HTML)<textarea defaultValue={post?.body ?? ""} maxLength={50_000} name="body" required /></label>
-        <label>Portada privada<input accept="image/jpeg,image/png,image/webp" disabled={uploading} onChange={uploadCover} type="file" /></label>
+        <div className="admin-form-grid"><label htmlFor="content-kind">Tipo<select defaultValue={post?.kind ?? "blog"} id="content-kind" name="kind"><option value="blog">Blog</option><option value="news">Noticia</option></select></label>
+        <label htmlFor="content-status">Estado<select defaultValue={post?.status ?? "draft"} id="content-status" name="status"><option value="draft">Borrador</option><option value="published">Publicado</option><option value="archived">Archivado</option></select></label></div>
+        <label htmlFor="content-title">Título<input defaultValue={post?.title ?? ""} id="content-title" maxLength={160} name="title" onChange={(event) => { if (!post) setSlug(slugify(event.currentTarget.value)); }} required /></label>
+        <label htmlFor="content-slug">Slug<input id="content-slug" maxLength={160} name="slug" onChange={(event) => setSlug(slugify(event.currentTarget.value))} pattern="[a-z0-9]+(-[a-z0-9]+)*" required value={slug} /></label>
+        <label htmlFor="content-summary">Resumen<input defaultValue={post?.summary ?? ""} id="content-summary" maxLength={320} minLength={10} name="summary" required /></label>
+        <label htmlFor="content-body">Contenido (Markdown seguro, sin HTML)<textarea defaultValue={post?.body ?? ""} id="content-body" maxLength={50_000} name="body" required /></label>
+        <label htmlFor="content-cover">Portada privada<input accept="image/jpeg,image/png,image/webp" disabled={uploading} id="content-cover" onChange={uploadCover} type="file" /></label>
         <input name="coverImagePath" type="hidden" value={imagePath} />
         {imagePath && <p>Archivo preparado: <code>{imagePath}</code></p>}
         {uploadMessage && <p role="status">{uploadMessage}</p>}
-        <label>Texto alternativo de la portada<input defaultValue={post?.cover_alt ?? ""} maxLength={160} name="coverAlt" /></label>
-        <label>Estado<select defaultValue={post?.status ?? "draft"} name="status"><option value="draft">Borrador</option><option value="published">Publicado</option><option value="archived">Archivado</option></select></label>
-        <button type="submit">{post ? "Guardar cambios" : "Crear contenido"}</button>
-      </form>
+        <label htmlFor="content-cover-alt">Texto alternativo de la portada<input defaultValue={post?.cover_alt ?? ""} id="content-cover-alt" maxLength={160} name="coverAlt" /></label>
+        <div className="admin-form-actions"><AdminSubmitButton pendingLabel="Guardando contenido…">{post ? "Guardar cambios" : "Crear contenido"}</AdminSubmitButton></div>
+      </AdminActionForm>
       {post && canDelete && (
-        <form action={deleteContentPost} className="admin-form" onSubmit={(event) => { if (!window.confirm("Esta eliminación no se puede deshacer. ¿Continuar?")) event.preventDefault(); }}>
+        <AdminActionForm action={deleteContentPost} className="admin-form" confirmMessage="Esta eliminación no se puede deshacer. ¿Continuar?">
           <input name="id" type="hidden" value={post.id} />
-          <button type="submit">Eliminar entrada</button>
-        </form>
+          <AdminSubmitButton pendingLabel="Eliminando…" variant="danger">Eliminar entrada</AdminSubmitButton>
+        </AdminActionForm>
       )}
     </>
   );

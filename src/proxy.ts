@@ -25,7 +25,7 @@ export async function proxy(request: NextRequest) {
     },
   });
   const { data: { user } } = await supabase.auth.getUser();
-  if (pathname === "/admin/login") {
+  if (pathname === "/admin/login" || pathname === "/admin/activar") {
     Object.entries(adminHeaders).forEach(([name, value]) => response.headers.set(name, value));
     return response;
   }

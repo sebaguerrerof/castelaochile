@@ -1,7 +1,7 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { ContentEditor } from "@/components/admin/content-editor";
+import { AdminPanel, PageHeader, SecondaryLink } from "@/components/admin/admin-ui";
 import { requireAdmin } from "@/lib/auth/admin";
 import { getAdminPost } from "@/lib/repositories/admin-repository";
 
@@ -12,14 +12,7 @@ export default async function EditContentPage({ params }: { params: Promise<{ id
   if (!post) notFound();
 
   return <>
-    <header className="admin-page-header">
-      <div>
-        <p className="eyebrow">CMS</p>
-        <h1>Editar entrada</h1>
-        <p>Un borrador no se expone mediante una URL pública ni se añade al sitemap.</p>
-        <Link className="admin-button-secondary" href={`/admin/contenidos/${post.id}/vista-previa`}>Abrir vista previa privada</Link>
-      </div>
-    </header>
-    <ContentEditor canDelete={admin.role === "superadmin"} post={post} userId={admin.user.id} />
+    <PageHeader actions={<SecondaryLink href={`/admin/contenidos/${post.id}/vista-previa`}>Abrir vista previa privada</SecondaryLink>} description="Un borrador no se expone mediante una URL pública ni se añade al sitemap." eyebrow="CMS" title={`Editar: ${post.title}`} />
+    <AdminPanel><ContentEditor canDelete={admin.role === "superadmin"} post={post} userId={admin.user.id} /></AdminPanel>
   </>;
 }

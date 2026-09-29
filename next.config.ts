@@ -12,6 +12,11 @@ function trustedSupabaseOrigin() {
 const supabaseOrigin = trustedSupabaseOrigin();
 const connectSources = ["'self'", supabaseOrigin].filter(Boolean).join(" ");
 const imageSources = ["'self'", "data:", "blob:", supabaseOrigin].filter(Boolean).join(" ");
+const scriptSources = [
+  "'self'",
+  "'unsafe-inline'",
+  process.env.NODE_ENV === "development" ? "'unsafe-eval'" : null,
+].filter(Boolean).join(" ");
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
@@ -20,7 +25,7 @@ const nextConfig: NextConfig = {
     return [{
       source: "/:path*",
       headers: [
-        { key: "Content-Security-Policy", value: `default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src ${imageSources}; connect-src ${connectSources}; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; upgrade-insecure-requests` },
+        { key: "Content-Security-Policy", value: `default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src ${imageSources}; connect-src ${connectSources}; script-src ${scriptSources}; style-src 'self' 'unsafe-inline'; font-src 'self' data:; upgrade-insecure-requests` },
         { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
         { key: "X-Content-Type-Options", value: "nosniff" },
         { key: "X-Frame-Options", value: "DENY" },
