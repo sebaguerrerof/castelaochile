@@ -4,7 +4,7 @@ Actualizado: 2026-09-30 (America/Santiago)
 
 ## Estado técnico
 
-**NO-GO para cierre definitivo: despliegue y acceptance test administrativo pendientes.** El entorno enlazado ya tiene las tres migraciones aplicadas, 232 artículos publicados y 709 medios. `blog:verify` pasa y la última sincronización confirma 232 sin cambios y cero fallidos.
+**NO-GO para cierre definitivo: acceptance test administrativo e indexación pendientes.** La aplicación está desplegada en https://castelaochile.vercel.app, con las tres migraciones aplicadas, 232 artículos publicados y 709 medios. `blog:verify` pasa y la última sincronización confirma 232 sin cambios y cero fallidos. La configuración global conserva el modo de revisión: `robots.txt` bloquea rastreo y el sitemap está vacío; no se activó indexación sin resolver la decisión SEO internacional.
 
 ## Realizado
 
@@ -98,10 +98,12 @@ Un post puede pertenecer a más de una categoría.
 
 - [x] Aplicar las migraciones `20260929195908`, `20260929201437` y `20260929204854` en el proyecto enlazado.
 - [x] Ejecutar la carga inicial, recuperación de medios y `blog:verify` en el entorno enlazado.
-- [ ] Desplegar la aplicación Next.js en producción.
+- [x] Desplegar la aplicación Next.js en producción (Vercel, commit `5cb51d4`, rama `feature/admin-supabase-cms`).
 - [ ] Acceptance test del administrador con una cuenta editorial real del entorno destino.
 - [ ] Ejecutar pgTAP en CI o en un host con Docker/Podman.
 - [ ] Revisión SEO internacional de canonical/hreflang (`SEO_DECISION_REQUIRED`).
+- [ ] Confirmar URL definitiva y habilitar `NEXT_PUBLIC_SITE_MODE=production` cuando se apruebe la indexación; redeploy y contrastar los 232 artículos del sitemap.
+- [ ] Incorporar favicon institucional aprobado: `/favicon.ico` devuelve 404.
 
 ## Deuda técnica
 
@@ -110,6 +112,7 @@ Un post puede pertenecer a más de una categoría.
 - La sincronización es manual y mantenible, pero todavía no existe scheduler/monitor automático.
 - La primera migración de 709 medios es conservadora y lenta; debe ejecutarse con timeout amplio.
 - El comando usa el soporte experimental de type stripping de Node 22 y emite su advertencia informativa.
+- Los fallos transitorios de media que dejan un hash fuente estable pueden requerir recuperación acotada; mejorar el reintento persistente sin alterar contenido local.
 
 ## Riesgos y decisiones
 
@@ -131,3 +134,13 @@ Un post puede pertenecer a más de una categoría.
 - La rama preview validada no presenta este error.
 - Limitación de entorno: `supabase test db` no puede iniciar pgTAP sin Docker/Podman.
 - Advertencias de contenido: 8 medios fuente con HTTP 404, registradas y degradadas sin fallar posts.
+
+## Despliegue y verificación de producción (2026-09-30)
+
+- Push realizado a `origin/feature/admin-supabase-cms`; implementación `5cb51d4`.
+- Vercel build y despliegue aprobados: https://castelaochile.vercel.app.
+- Navegador: 232 artículos, búsqueda alcohol con 186 resultados, páginas 1/2 y búsqueda+página 2 con 12 tarjetas, artículo de 2018 y artículo sin portada correctos.
+- Desktop 1440 px y móvil emulado 375 px sin overflow horizontal ni imágenes rotas; Tab recorre enlace de salto, navegación, buscador y filtros.
+- QA con caché: PASS, cero errores de consola y red. QA repetido con perfil limpio: FAIL exclusivamente por `https://castelaochile.vercel.app/favicon.ico` (404); listado, búsquedas, artículos, imágenes y viewports cumplen las comprobaciones. No se considera resuelto por desaparecer con caché.
+- `/admin/contenidos` sin sesión redirige correctamente a `/admin/login`. La creación/edición con una cuenta editorial real aún no fue validada en este despliegue.
+- `/` y `/sitemap.xml` responden 200. El sitemap vacío y `Disallow: /` son consecuencia del modo de revisión existente, no una validación SEO aprobada para indexación.

@@ -1,6 +1,6 @@
 # Auditoría inicial del Blog de Castelao Chile
 
-Fecha: 2026-09-29  
+Fecha: 2026-09-29
 Documento rector: `CASTELAO_CHILE_BLOG_CODEX.md`
 
 ## Resumen ejecutivo

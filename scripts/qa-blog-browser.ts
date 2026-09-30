@@ -42,8 +42,8 @@ async function inspectPage(path: string, viewport: { width: number; height: numb
     }
     if (message.method === "Runtime.exceptionThrown") consoleErrors.push(JSON.stringify(message.params));
     if (message.method === "Log.entryAdded") {
-      const entry = message.params?.entry as { level?: string; text?: string } | undefined;
-      if (entry?.level === "error") consoleErrors.push(entry.text ?? "Unknown log error");
+      const entry = message.params?.entry as { level?: string; text?: string; url?: string } | undefined;
+      if (entry?.level === "error") consoleErrors.push(`${entry.text ?? "Unknown log error"}${entry.url ? ` (${entry.url})` : ""}`);
     }
     if (message.method === "Network.loadingFailed") {
       const details = message.params as { blockedReason?: string; canceled?: boolean; errorText?: string } | undefined;

@@ -206,7 +206,9 @@ La prueba pgTAP está en `supabase/tests/blog_rls_test.sql`. `supabase test db` 
 
 ## Troubleshooting
 
-Estado operativo 2026-09-30: las tres migraciones y la carga completa ya están aplicadas al proyecto enlazado. Hay 232 posts publicados, 11 categorías, 268 relaciones y 709 medios presentes. La pasada final de sincronización obtuvo 0 creados, 0 actualizados, 232 sin cambios y 0 fallidos. Los pendientes de despliegue y aceptación se mantienen en `CASTELAO_CHILE_BLOG_STATUS.md`.
+Estado operativo 2026-09-30: las tres migraciones y la carga completa ya están aplicadas al proyecto enlazado y la aplicación está desplegada en https://castelaochile.vercel.app. Hay 232 posts publicados, 11 categorías, 268 relaciones y 709 medios presentes. La pasada final de sincronización obtuvo 0 creados, 0 actualizados, 232 sin cambios y 0 fallidos. El QA público confirma contenido y responsive; el perfil limpio detecta únicamente el favicon ausente. La aceptación del administrador autenticado y la decisión de indexación siguen pendientes en `CASTELAO_CHILE_BLOG_STATUS.md`.
+
+La configuración global mantiene el modo de revisión: `NEXT_PUBLIC_SITE_MODE` debe aprobarse y establecerse en `production` junto con la URL definitiva antes de habilitar indexación. Mientras tanto, `robots.txt` usa `Disallow: /` y el sitemap es deliberadamente vacío. Tras ese cambio, redeploy y verificar que el sitemap incluya los 232 artículos; no confundir despliegue público con aprobación SEO.
 
 - **Media warning 404**: el artículo queda disponible sin la imagen afectada. Registrar la URL/ID y solicitar el asset si debe recuperarse.
 - **Portada rota mediante `/_next/image`**: confirmar que `PublishedCover` conserva `unoptimized`; las URLs firmadas internas no deben pasar por el optimizador de Next 16.
