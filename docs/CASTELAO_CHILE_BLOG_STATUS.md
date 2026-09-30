@@ -154,5 +154,6 @@ Un post puede pertenecer a más de una categoría.
 - [x] Hero eager/high; tarjetas lazy; API privada de imágenes sin cambios.
 - [x] Capturas locales verificadas de artículo antiguo y reciente con título largo, desktop 1440 y móvil 375; sin overflow ni imágenes rotas. QA caliente PASS; el único fallo frío sigue siendo el favicon previamente registrado.
 - [x] Lint/typecheck/build PASS; tests 40/40 PASS.
-- [ ] Publicar y contrastar el nuevo diseño en producción.
+- [x] Publicar y contrastar el nuevo diseño en producción: commit `8cfb26a`, https://castelaochile.vercel.app. HTTP 200 en artículo antiguo, reciente y sin portada; capturas de hero/cuerpo comprobadas en 1440px/375px. El QA frío sigue fallando exclusivamente por el favicon ya registrado.
+- [x] Segunda pasada de producción: QA PASS en 11 recorridos, sin errores de consola/red ni imágenes rotas; no borra el pendiente del favicon observado sin caché.
 - Pendientes anteriores de aceptación admin, indexación, favicon y pgTAP se conservan; esta mejora visual no los da por resueltos.

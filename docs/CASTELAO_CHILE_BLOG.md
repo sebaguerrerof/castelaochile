@@ -155,7 +155,7 @@ No se añadió un CRUD completo de categorías: el catálogo sincronizado se reu
 - Un trigger de base de datos protege campos sincronizados aun si se evita la UI.
 - Las rutas de media validan slug/path y visibilidad antes de firmar.
 
-## SEO
+## Página individual
 
 ### Diseño de la página individual (2026-09-30)
 
@@ -166,6 +166,8 @@ El cuerpo está centrado con ancho máximo de 68ch, texto de 18px desktop/17px m
 Referencias de diseño: [W3C: presentación visual](https://www.w3.org/WAI/WCAG22/Understanding/visual-presentation) y [W3C: ajustes del design system](https://design-system.w3.org/settings/). Se toman como guía de longitud de línea y legibilidad; no se declara conformidad WCAG completa por este cambio. Los hero adaptan su altura al título y conservan foco visible.
 
 El QA automatizado incluye artículo histórico, artículo reciente con título largo y artículo sin portada en 1440px/375px. `BLOG_QA_SCREENSHOT_DIR` habilita capturas de hero y cuerpo mediante el script de QA existente.
+
+## SEO
 
 - metadata dinámica por post;
 - fallback `seo_title ?? title` y `seo_description ?? summary`;
