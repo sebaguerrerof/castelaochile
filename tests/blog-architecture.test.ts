@@ -49,6 +49,20 @@ test("sync targets only Spain records and never overwrites local status or SEO",
   assert.doesNotMatch(updateBranch, /seo_title\s*:/);
 });
 
+test("article hero and readable content are shared without changing editorial data", () => {
+  const hero = source("src/components/content/article-hero.tsx");
+  const css = source("src/app/(public)/public-content.css");
+  assert.match(hero, /post.coverImagePath && <PublishedCover/);
+  assert.match(hero, /<h1>\{post.title\}<\/h1>/);
+  assert.match(hero, /eager kind=\{post.kind\}/);
+  for (const route of ["blog", "noticias"]) {
+    assert.match(source(`src/app/(public)/${route}/[slug]/page.tsx`), /<ArticleHero post=\{post\}/);
+  }
+  assert.match(css, /\.article-body \{ max-width: 68ch/);
+  assert.match(css, /\.article-hero--image::after/);
+  assert.match(css, /\.article-hero a:focus-visible/);
+});
+
 test("admin covers full editorial model and source-managed fields are locked", () => {
   const editor = source("src/components/admin/content-editor.tsx");
   const repository = source("src/lib/repositories/content-repository.ts");

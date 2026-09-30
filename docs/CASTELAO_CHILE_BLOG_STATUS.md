@@ -144,3 +144,15 @@ Un post puede pertenecer a más de una categoría.
 - QA con caché: PASS, cero errores de consola y red. QA repetido con perfil limpio: FAIL exclusivamente por `https://castelaochile.vercel.app/favicon.ico` (404); listado, búsquedas, artículos, imágenes y viewports cumplen las comprobaciones. No se considera resuelto por desaparecer con caché.
 - `/admin/contenidos` sin sesión redirige correctamente a `/admin/login`. La creación/edición con una cuenta editorial real aún no fue validada en este despliegue.
 - `/` y `/sitemap.xml` responden 200. El sitemap vacío y `Disallow: /` son consecuencia del modo de revisión existente, no una validación SEO aprobada para indexación.
+
+## Rediseño de página individual (2026-09-30)
+
+- [x] Hero con portada principal y título superpuesto; fallback institucional para artículos sin imagen.
+- [x] Corregido el ancho exterior limitado/descentrado; columna editorial centrada de 68ch.
+- [x] Bajada, autor, fecha y lectura separados; mejores párrafos, listas, citas, headings, tablas e imágenes.
+- [x] Hero/introducción reutilizados en Blog y Noticias; skeleton actualizado; contenido y datos intactos.
+- [x] Hero eager/high; tarjetas lazy; API privada de imágenes sin cambios.
+- [x] Capturas locales verificadas de artículo antiguo y reciente con título largo, desktop 1440 y móvil 375; sin overflow ni imágenes rotas. QA caliente PASS; el único fallo frío sigue siendo el favicon previamente registrado.
+- [x] Lint/typecheck/build PASS; tests 40/40 PASS.
+- [ ] Publicar y contrastar el nuevo diseño en producción.
+- Pendientes anteriores de aceptación admin, indexación, favicon y pgTAP se conservan; esta mejora visual no los da por resueltos.

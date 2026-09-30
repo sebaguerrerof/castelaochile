@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
-import { PublishedCover } from "@/components/content/published-cover";
+import { ArticleHero, ArticleIntroduction } from "@/components/content/article-hero";
+import { Container } from "@/components/layout/container";
+import { SafeHtml } from "@/components/content/safe-html";
 import { SafeMarkdown } from "@/components/content/safe-markdown";
 import { siteConfig } from "@/config/site";
 import { getPublishedPost } from "@/lib/repositories/content-repository";
@@ -14,5 +16,5 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 export default async function NewsPostPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params; const post = await getPublishedPost("news", slug); if (!post) notFound();
-  return <article className="page-shell article"><header className="page-hero"><p className="eyebrow text-primary">Noticia</p><h1>{post.title}</h1><p>{post.summary}</p><time dateTime={post.publishedAt}>{new Intl.DateTimeFormat("es-CL", { dateStyle: "long", timeZone: "America/Santiago" }).format(new Date(post.publishedAt))}</time></header>{post.coverImagePath && <PublishedCover alt={post.coverAlt || post.title} kind="news" slug={post.slug} />}<SafeMarkdown value={post.body} /></article>;
+  return <article className="article"><ArticleHero post={post} /><Container className="article__container"><ArticleIntroduction post={post} />{post.contentHtml ? <SafeHtml value={post.contentHtml} /> : <SafeMarkdown value={post.body} />}</Container></article>;
 }

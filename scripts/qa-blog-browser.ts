@@ -1,3 +1,6 @@
+import { mkdir, writeFile } from "node:fs/promises";
+import { join } from "node:path";
+
 type Pending = { resolve: (value: unknown) => void; reject: (error: Error) => void };
 
 const DEBUG_PORT = process.env.CHROME_DEBUG_PORT ?? "9229";
@@ -105,7 +108,7 @@ async function inspectPage(path: string, viewport: { width: number; height: numb
       scrollWidth: document.documentElement.scrollWidth,
       horizontalOverflow: document.documentElement.scrollWidth > window.innerWidth + 1,
       articleBody: Boolean(document.querySelector('.article-body')),
-      articleCover: Boolean(document.querySelector('.article > .article__container > .content-cover')),
+      articleCover: Boolean(document.querySelector('.article-hero > .content-cover')),
       jsonLd: Boolean(document.querySelector('script[type="application/ld+json"]')),
       canonical: document.querySelector('link[rel="canonical"]')?.getAttribute('href') ?? null,
       searchValue: document.querySelector('.blog-search input')?.value ?? null,
@@ -120,6 +123,16 @@ async function inspectPage(path: string, viewport: { width: number; height: numb
         await send("Input.dispatchKeyEvent", { type: "keyUp", key: "Tab", code: "Tab", windowsVirtualKeyCode: 9, nativeVirtualKeyCode: 9 });
         focusOrder.push(await evaluate(`(() => { const element = document.activeElement; return { tag: element?.tagName ?? '', text: element?.textContent?.replace(/\\s+/g, ' ').trim().slice(0, 80) ?? '', href: element?.getAttribute?.('href') ?? null, aria: element?.getAttribute?.('aria-label') ?? null }; })()`));
       }
+    }
+    if (process.env.BLOG_QA_SCREENSHOT_DIR && metrics.articleBody) {
+      const directory = process.env.BLOG_QA_SCREENSHOT_DIR;
+      await mkdir(directory, { recursive: true });
+      const screenshot = await send<{ data: string }>("Page.captureScreenshot", { format: "png", captureBeyondViewport: false });
+      const filename = `${path.split("/").at(-1)}-${viewport.width}.png`;
+      await writeFile(join(directory, filename), Buffer.from(screenshot.data, "base64"));
+      await evaluate("window.scrollTo({ top: document.querySelector('.article-hero').getBoundingClientRect().height + 300, behavior: 'instant' }); true");
+      const bodyScreenshot = await send<{ data: string }>("Page.captureScreenshot", { format: "png", captureBeyondViewport: false });
+      await writeFile(join(directory, `body-${filename}`), Buffer.from(bodyScreenshot.data, "base64"));
     }
     return { path, viewport, metrics, focusOrder, consoleErrors, failedRequests };
   } finally {
@@ -138,6 +151,10 @@ async function main() {
     await inspectPage("/blog/tipos-de-terapias-en-tratamiento-de-adicciones", desktop),
     await inspectPage("/blog/alcohol-y-conduccion", desktop),
     await inspectPage("/blog", { width: 375, height: 812, mobile: true }),
+    await inspectPage("/blog/tipos-de-terapias-en-tratamiento-de-adicciones", { width: 375, height: 812, mobile: true }, true),
+    await inspectPage("/blog/alcohol-y-conduccion", { width: 375, height: 812, mobile: true }),
+    await inspectPage("/blog/vuelta-a-la-rutina-y-consumo-de-alcohol", desktop),
+    await inspectPage("/blog/vuelta-a-la-rutina-y-consumo-de-alcohol", { width: 375, height: 812, mobile: true }),
   ];
 
   console.log(JSON.stringify({ status: "INSPECTED", checks }, null, 2));
@@ -154,6 +171,7 @@ async function main() {
   assert(checks[2].metrics.cards === 12 && checks[2].metrics.total.includes("186") && checks[2].metrics.searchValue === "alcohol", "Search results are incorrect.");
   assert(checks[3].metrics.cards === 12 && checks[3].metrics.currentPage?.startsWith("2"), "Search pagination did not render correctly.");
   assert(checks[4].metrics.articleBody && checks[4].metrics.jsonLd && checks[4].metrics.canonical?.includes(checks[4].path), "The oldest article is missing content or SEO metadata.");
+  assert(checks[4].metrics.articleCover, "The image article is missing its hero cover.");
   assert(checks[5].metrics.articleBody && !checks[5].metrics.articleCover, "The no-image article did not use the expected fallback layout.");
   assert(checks[6].metrics.innerWidth === 375, "Mobile emulation did not use a 375px viewport.");
   assert(checks[0].focusOrder.filter((entry) => entry.tag === "A" || entry.tag === "INPUT" || entry.tag === "BUTTON").length >= 10, "Keyboard focus did not traverse the expected interactive controls.");

@@ -157,6 +157,16 @@ No se añadió un CRUD completo de categorías: el catálogo sincronizado se reu
 
 ## SEO
 
+### Diseño de la página individual (2026-09-30)
+
+Blog y Noticias comparten `ArticleHero` y `ArticleIntroduction`: portada a ancho completo, título HTML sobre overlay oscuro, categorías y breadcrumbs; sin portada se utiliza un fondo institucional, sin imágenes inventadas. La imagen del hero se carga eager/high y las tarjetas continúan lazy. Se mantiene el endpoint de media seguro y `unoptimized` por su redirección firmada.
+
+El cuerpo está centrado con ancho máximo de 68ch, texto de 18px desktop/17px móvil, interlineado 1.8, párrafos no justificados, jerarquía H2–H4, listas, citas, imágenes y tablas con overflow contenido. No cambia el contenido almacenado ni la sincronización. El skeleton representa la nueva composición.
+
+Referencias de diseño: [W3C: presentación visual](https://www.w3.org/WAI/WCAG22/Understanding/visual-presentation) y [W3C: ajustes del design system](https://design-system.w3.org/settings/). Se toman como guía de longitud de línea y legibilidad; no se declara conformidad WCAG completa por este cambio. Los hero adaptan su altura al título y conservan foco visible.
+
+El QA automatizado incluye artículo histórico, artículo reciente con título largo y artículo sin portada en 1440px/375px. `BLOG_QA_SCREENSHOT_DIR` habilita capturas de hero y cuerpo mediante el script de QA existente.
+
 - metadata dinámica por post;
 - fallback `seo_title ?? title` y `seo_description ?? summary`;
 - Open Graph y Twitter Card;

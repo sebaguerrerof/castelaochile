@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { PostCard } from "@/components/content/post-card";
-import { PublishedCover } from "@/components/content/published-cover";
+import { ArticleHero, ArticleIntroduction } from "@/components/content/article-hero";
 import { SafeHtml } from "@/components/content/safe-html";
 import { SafeMarkdown } from "@/components/content/safe-markdown";
 import { Container } from "@/components/layout/container";
@@ -43,17 +43,12 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
   return <>
     <script dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} type="application/ld+json" />
     <article className="article">
+      <ArticleHero post={post} />
       <Container className="article__container">
-        <nav aria-label="Migas de pan" className="article-breadcrumbs"><Link href="/blog">Blog</Link><span aria-hidden="true">/</span><span aria-current="page">Artículo</span></nav>
-        <header className="article-header">
-          {post.categories.length > 0 && <div className="article-categories">{post.categories.map((category) => <Link href={`/blog?categoria=${encodeURIComponent(category.slug)}`} key={category.slug}>{category.name}</Link>)}</div>}
-          <h1>{post.title}</h1>
-          <p className="article-header__summary">{post.summary}</p>
-          <div className="article-meta"><time dateTime={post.publishedAt}>{new Intl.DateTimeFormat("es-CL", { dateStyle: "long", timeZone: "America/Santiago" }).format(new Date(post.publishedAt))}</time>{post.authorName && <span>Por {post.authorName}</span>}{post.readingTimeMinutes && <span>{post.readingTimeMinutes} min de lectura</span>}</div>
-        </header>
-        {post.coverImagePath && <PublishedCover alt={post.coverAlt || post.title} kind="blog" slug={post.slug} />}
+        <ArticleIntroduction post={post} />
         {post.contentHtml ? <SafeHtml value={post.contentHtml} /> : <SafeMarkdown value={post.body} />}
         {post.origin === "castelao_es" && post.sourceUrl && <aside className="article-source"><p>Contenido editorial publicado originalmente por Instituto Castelao.</p><a href={post.sourceUrl} rel="noopener noreferrer" target="_blank">Ver publicación original</a></aside>}
+        <div className="article-back"><Link href="/blog">← Volver a todos los artículos</Link></div>
       </Container>
     </article>
     {related.length > 0 && <section className="related-posts"><Container><p className="eyebrow">También puede interesarte</p><h2>Continúa explorando</h2><div className="blog-grid">{related.map((item) => <PostCard key={item.id} post={item} />)}</div></Container></section>}
