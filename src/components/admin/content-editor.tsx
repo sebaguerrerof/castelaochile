@@ -8,6 +8,8 @@ import { AdminActionForm } from "@/components/admin/admin-action-form";
 import { AdminSubmitButton } from "@/components/admin/admin-submit-button";
 import { RichTextEditor } from "@/components/admin/rich-text-editor";
 import { createBrowserSupabaseClient } from "@/lib/supabase/browser";
+import { uploadContentImage } from "@/lib/content-image-upload";
+import { formatChileDate } from "@/lib/format-chile-date";
 import type { Database } from "@/types/database";
 
 type EditablePost = Database["public"]["Tables"]["content_posts"]["Row"] & { categoryIds: string[] };
@@ -58,17 +60,14 @@ export function ContentEditor({ post, userId, canDelete, categories }: { post: E
     }
     setUploading(true);
     setUploadMessage(null);
-    const extension = file.name.split(".").pop()?.toLowerCase() || "image";
-    const path = `${userId}/${crypto.randomUUID()}.${extension}`;
     const client = createBrowserSupabaseClient();
-    const { error } = await client.storage.from("content-images").upload(path, file, { contentType: file.type, cacheControl: "31536000", upsert: false });
-    if (error) setUploadMessage("No fue posible subir la imagen. Confirma tu sesión y permisos.");
-    else {
+    try {
+      const path = await uploadContentImage(file, userId);
       const { data } = await client.storage.from("content-images").createSignedUrl(path, 600);
       setImagePath(path);
       setImagePreview(data?.signedUrl ?? null);
       setUploadMessage("Imagen cargada y preparada para la publicación.");
-    }
+    } catch (error) { setUploadMessage(error instanceof Error ? error.message : "No fue posible subir la imagen."); }
     setUploading(false);
   }
 
@@ -115,7 +114,7 @@ export function ContentEditor({ post, userId, canDelete, categories }: { post: E
           <div className="admin-form-actions"><AdminSubmitButton pendingLabel="Guardando contenido…">{post ? "Guardar cambios" : "Crear contenido"}</AdminSubmitButton></div>
         </fieldset>
         {post && <fieldset className="admin-fieldset admin-system-info"><legend>Información de sistema</legend>
-          <dl><div><dt>Origen</dt><dd>{synchronized ? "Castelao España" : "Castelao Chile"}</dd></div><div><dt>Tiempo de lectura</dt><dd>{post.reading_time_minutes ? `${post.reading_time_minutes} min` : "Se calculará al guardar"}</dd></div><div><dt>Última sincronización</dt><dd>{post.synced_at ? new Intl.DateTimeFormat("es-CL", { dateStyle: "medium", timeStyle: "short" }).format(new Date(post.synced_at)) : "No aplica"}</dd></div><div><dt>Creado</dt><dd>{new Intl.DateTimeFormat("es-CL", { dateStyle: "medium" }).format(new Date(post.created_at))}</dd></div><div><dt>Actualizado</dt><dd>{new Intl.DateTimeFormat("es-CL", { dateStyle: "medium" }).format(new Date(post.updated_at))}</dd></div></dl>
+          <dl><div><dt>Origen</dt><dd>{synchronized ? "Castelao España" : "Castelao Chile"}</dd></div><div><dt>Tiempo de lectura</dt><dd>{post.reading_time_minutes ? `${post.reading_time_minutes} min` : "Se calculará al guardar"}</dd></div><div><dt>Última sincronización</dt><dd>{post.synced_at ? formatChileDate(post.synced_at, true) : "No aplica"}</dd></div><div><dt>Creado</dt><dd>{formatChileDate(post.created_at)}</dd></div><div><dt>Actualizado</dt><dd>{formatChileDate(post.updated_at)}</dd></div></dl>
         </fieldset>}
       </aside>
     </AdminActionForm>

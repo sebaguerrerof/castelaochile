@@ -6,6 +6,8 @@ import { ForbiddenAdminError, UnauthenticatedAdminError, requireAdmin, type Admi
 import { RuntimeConfigurationError } from "@/lib/runtime-config";
 
 import "./admin.css";
+import "@/app/(public)/public-content.css";
+import "@/app/(public)/public-design.css";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;

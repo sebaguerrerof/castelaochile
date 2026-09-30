@@ -18,7 +18,9 @@ export const buttonVariants = cva(
         accent:
           "bg-accent px-6 py-3 text-accent-foreground hover:brightness-95",
         inverted:
-          "border border-primary-foreground/35 bg-primary-foreground text-primary hover:bg-primary-foreground/90",
+          "border border-primary-foreground/35 bg-primary-foreground px-6 py-3 text-primary hover:bg-primary-foreground/90",
+        invertedOutline:
+          "border border-primary-foreground/55 bg-transparent px-6 py-3 text-primary-foreground hover:bg-primary-foreground/10",
         quiet: "px-2 py-2 text-primary underline-offset-4 hover:underline",
       },
       size: {

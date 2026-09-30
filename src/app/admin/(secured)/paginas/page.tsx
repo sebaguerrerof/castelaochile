@@ -1,0 +1,8 @@
+import Link from "next/link";
+import { AdminNotice, AdminPanel, PageHeader, StatusBadge } from "@/components/admin/admin-ui";
+import { listAdminPages } from "@/lib/cms/repository";
+import { requireAdmin } from "@/lib/auth/admin";
+export default async function PagesList() {
+ const admin = await requireAdmin(); const pages = await listAdminPages();
+ return <><PageHeader eyebrow="CMS" title="Páginas" description="Contenido institucional por bloques. Las rutas se conservan; borradores y archivo quedan fuera de la web." /><AdminNotice tone="info">Guardar una página publicada como borrador la retira temporalmente de la web.</AdminNotice><AdminPanel className="admin-table-panel"><div className="admin-table-wrap"><table className="admin-table"><thead><tr><th>Página</th><th>Ruta</th><th>Estado</th><th>Actualización</th><th>Actualizado por</th><th>Acciones</th></tr></thead><tbody>{pages.map((page) => <tr key={page.id}><td data-label="Página">{page.title}</td><td data-label="Ruta">{page.path}</td><td data-label="Estado"><StatusBadge value={page.status} /></td><td data-label="Actualización">{new Intl.DateTimeFormat("es-CL", { dateStyle: "medium", timeZone: "America/Santiago" }).format(new Date(page.updated_at))}</td><td data-label="Actualizado por">{page.updated_by ?? "Migración inicial"}</td><td data-label="Acciones"><div className="admin-table-actions">{admin.role !== "viewer" && <Link href={`/admin/paginas/${page.id}`}>Editar</Link>}<Link href={`/admin/paginas/${page.id}/vista-previa`}>Vista previa</Link>{page.status === "published" && <Link href={page.path}>Ver publicada</Link>}</div></td></tr>)}</tbody></table></div></AdminPanel></>;
+}

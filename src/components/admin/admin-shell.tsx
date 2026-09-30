@@ -35,6 +35,9 @@ const navigation: NavigationItem[] = [
   { href: "/admin/analitica", icon: ChartNoAxesCombined, label: "Analítica" },
   { href: "/admin/consultas", icon: Inbox, label: "Consultas", roles: ["editor", "superadmin"] },
   { href: "/admin/contenidos", icon: FileText, label: "Contenidos" },
+  { href: "/admin/paginas", icon: FileText, label: "Páginas" },
+  { href: "/admin/equipo", icon: Users, label: "Equipo" },
+  { href: "/admin/configuracion", icon: FileText, label: "Configuración", roles: ["editor", "superadmin"] },
   { href: "/admin/usuarios", icon: Users, label: "Usuarios", roles: ["superadmin"] },
 ];
 
@@ -49,6 +52,9 @@ const segmentLabels: Record<string, string> = {
   analitica: "Analítica",
   consultas: "Consultas",
   contenidos: "Contenidos",
+  paginas: "Páginas",
+  equipo: "Equipo",
+  configuracion: "Configuración",
   usuarios: "Usuarios",
   perfil: "Mi perfil",
   nuevo: "Nueva entrada",

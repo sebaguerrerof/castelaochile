@@ -6,11 +6,11 @@ import StarterKit from "@tiptap/starter-kit";
 import { Bold, Heading2, Heading3, ImagePlus, Italic, Link2, List, ListOrdered, Minus, Quote } from "lucide-react";
 import { useRef, useState } from "react";
 
-import { createBrowserSupabaseClient } from "@/lib/supabase/browser";
+import { uploadContentImage } from "@/lib/content-image-upload";
 
-type RichTextEditorProps = { initialHtml: string; name: string; readOnly?: boolean; userId: string };
+type RichTextEditorProps = { initialHtml: string; name: string; readOnly?: boolean; userId: string; onChange?: (html: string) => void };
 
-export function RichTextEditor({ initialHtml, name, readOnly = false, userId }: RichTextEditorProps) {
+export function RichTextEditor({ initialHtml, name, readOnly = false, userId, onChange }: RichTextEditorProps) {
   const [html, setHtml] = useState(initialHtml);
   const [message, setMessage] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
@@ -23,7 +23,7 @@ export function RichTextEditor({ initialHtml, name, readOnly = false, userId }: 
       StarterKit.configure({ heading: { levels: [2, 3] }, link: { openOnClick: false, autolink: true, defaultProtocol: "https" } }),
       Image.configure({ allowBase64: false, inline: false }),
     ],
-    onUpdate: ({ editor: current }) => setHtml(current.getHTML()),
+    onUpdate: ({ editor: current }) => { setHtml(current.getHTML()); onChange?.(current.getHTML()); },
   });
 
   function setLink() {
@@ -36,7 +36,8 @@ export function RichTextEditor({ initialHtml, name, readOnly = false, userId }: 
   }
 
   async function uploadImage(event: React.ChangeEvent<HTMLInputElement>) {
-    const file = event.currentTarget.files?.[0];
+    const input = event.currentTarget;
+    const file = input.files?.[0];
     if (!file || !editor) return;
     if (!new Set(["image/jpeg", "image/png", "image/webp"]).has(file.type) || file.size > 5 * 1024 * 1024) {
       setMessage("Usa JPG, PNG o WebP de hasta 5 MB.");
@@ -44,17 +45,15 @@ export function RichTextEditor({ initialHtml, name, readOnly = false, userId }: 
     }
     setUploading(true);
     setMessage(null);
-    const extension = file.name.split(".").pop()?.toLowerCase() || "image";
-    const path = `${userId}/${crypto.randomUUID()}.${extension}`;
-    const { error } = await createBrowserSupabaseClient().storage.from("content-images").upload(path, file, { contentType: file.type, cacheControl: "31536000", upsert: false });
-    if (error) setMessage("No fue posible subir la imagen del contenido.");
-    else {
+    try {
+      const path = await uploadContentImage(file, userId);
       editor.chain().focus().setImage({ src: `/api/public/media/content/${path}`, alt: file.name.replace(/\.[^.]+$/, "") }).run();
       setHtml(editor.getHTML());
+      onChange?.(editor.getHTML());
       setMessage("Imagen insertada en el contenido.");
-    }
+    } catch (error) { setMessage(error instanceof Error ? error.message : "No fue posible subir la imagen."); }
     setUploading(false);
-    event.currentTarget.value = "";
+    input.value = "";
   }
 
   if (readOnly) return <><input name={name} type="hidden" value={html} /><div className="admin-rich-editor admin-rich-editor--readonly"><EditorContent editor={editor} /></div></>;

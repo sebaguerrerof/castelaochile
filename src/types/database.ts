@@ -1,4 +1,5 @@
 /** Supabase database contract synchronized from the linked public schema on 2026-09-29. */
+import type { CmsTables } from "./cms";
 export type AdminRole = "superadmin" | "editor" | "viewer";
 export type ContactSubmissionStatus = "new" | "in_progress" | "closed" | "spam";
 export type ContentKind = "blog" | "news";
@@ -10,7 +11,7 @@ export type Json = string | number | boolean | null | { [key: string]: Json | un
 export type Database = {
   __InternalSupabase: { PostgrestVersion: "14.5" };
   public: {
-    Tables: {
+    Tables: CmsTables & {
       admin_users: {
         Row: { user_id: string; role: AdminRole; is_active: boolean; created_at: string; updated_at: string };
         Insert: { user_id: string; role?: AdminRole; is_active?: boolean; created_at?: string; updated_at?: string };
@@ -65,6 +66,7 @@ export type Database = {
     };
     Views: Record<never, never>;
     Functions: {
+      save_cms_page: { Args: { p_page: Json }; Returns: string };
       record_page_view: { Args: { p_path: string; p_event_date: string }; Returns: undefined };
       search_blog_posts: {
         Args: { p_query?: string; p_category?: string | null; p_offset?: number; p_limit?: number };

@@ -27,7 +27,7 @@ test("legacy fragments and WhatsApp resolve safely", () => {
 
 test("motion and responsive safeguards remain in place", () => {
   const header = source("src/components/layout/header.tsx"); const styles = source("src/app/globals.css");
-  assert.match(header, /event\.key === "Escape"/); assert.match(header, /aria-current/); assert.match(styles, /prefers-reduced-motion: reduce/); assert.match(styles, /env\(safe-area-inset-bottom\)/);
+  assert.match(header, /event\.key !== "Escape"/); assert.match(header, /aria-current/); assert.match(header, /showModal\(\)/); assert.match(styles, /prefers-reduced-motion: reduce/); assert.match(styles, /env\(safe-area-inset-bottom\)/);
 });
 
 test("the contact form is real but remains closed until its privacy gate is approved", () => {

@@ -27,7 +27,7 @@ export function BrandLogo({
         alt={logo.alt}
         className="brand-logo__asset"
         height={logo.height}
-        priority={priority}
+        preload={priority}
         sizes={placement === "header" ? "(max-width: 640px) 190px, 236px" : "210px"}
         src={logo.src}
         width={logo.width}

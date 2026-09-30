@@ -29,6 +29,10 @@
 !/docs/ADMIN_REDESIGN_STATUS.md
 !/docs/CASTELAO_CHILE_BLOG.md
 !/docs/CASTELAO_CHILE_BLOG_STATUS.md
+!/docs/CASTELAO_CMS_AUDIT.md
+!/docs/CASTELAO_CMS.md
+!/docs/CASTELAO_CMS_STATUS.md
+!/docs/PUBLIC_DESIGN_SYSTEM.md
 
 # credentials, certificates, backups, and local reports
 *.pem
