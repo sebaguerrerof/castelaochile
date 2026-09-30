@@ -4,7 +4,7 @@ import { siteConfig } from "@/config/site";
 import { listSitemapPosts } from "@/lib/repositories/content-repository";
 
 const contentLastModified = new Date("2026-09-23T00:00:00.000Z");
-const indexablePaths = ["/", "/instituto", "/acompanamiento", "/nuestro-enfoque", "/familias", "/preguntas-frecuentes", "/contacto"] as const;
+const indexablePaths = ["/", "/instituto", "/acompanamiento", "/nuestro-enfoque", "/familias", "/preguntas-frecuentes", "/blog", "/contacto"] as const;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   if (siteConfig.isReview) return [];

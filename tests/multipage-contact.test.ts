@@ -11,7 +11,7 @@ const workspace = fileURLToPath(new URL("../", import.meta.url));
 const source = (path: string) => readFileSync(new URL(path, `file:///${workspace.replace(/\\/g, "/")}`), "utf8");
 
 test("the primary navigation exposes all institutional routes", () => {
-  assert.deepEqual(navigationItems.map((item) => item.href), ["/", "/instituto", "/acompanamiento", "/nuestro-enfoque", "/familias", "/preguntas-frecuentes", "/contacto"]);
+  assert.deepEqual(navigationItems.map((item) => item.href), ["/", "/blog", "/acompanamiento", "/nuestro-enfoque", "/familias", "/preguntas-frecuentes", "/contacto"]);
   assert.ok(navigationItems.every((item) => !item.href.startsWith("#")));
 });
 

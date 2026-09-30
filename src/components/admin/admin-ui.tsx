@@ -3,7 +3,7 @@ import { CircleAlert, Inbox, SearchX, ToggleLeft } from "lucide-react";
 import Link from "next/link";
 
 import { cn } from "@/lib/utils";
-import type { AdminRole, ContactSubmissionStatus, ContentKind, ContentStatus } from "@/types/database";
+import type { AdminRole, ContactSubmissionStatus, ContentKind, ContentOrigin, ContentStatus } from "@/types/database";
 
 export function PageHeader({ actions, description, eyebrow, title }: { actions?: React.ReactNode; description: string; eyebrow?: string; title: string }) {
   return (
@@ -18,8 +18,8 @@ export function MetricCard({ detail, icon: Icon, label, value }: { detail?: stri
   return <article className="admin-metric-card"><div className="admin-metric-card-heading"><span>{label}</span><Icon aria-hidden="true" size={18} /></div><strong>{value}</strong>{detail && <small>{detail}</small>}</article>;
 }
 
-const labels: Record<AdminRole | ContactSubmissionStatus | ContentKind | ContentStatus, string> = {
-  archived: "Archivado", blog: "Blog", closed: "Cerrada", draft: "Borrador", editor: "Editor", in_progress: "En progreso", new: "Nueva", news: "Noticia", published: "Publicado", spam: "Spam", superadmin: "Superadministrador", viewer: "Solo lectura",
+const labels: Record<AdminRole | ContactSubmissionStatus | ContentKind | ContentOrigin | ContentStatus, string> = {
+  archived: "Archivado", blog: "Blog", castelao_cl: "Castelao Chile", castelao_es: "Castelao España", closed: "Cerrada", draft: "Borrador", editor: "Editor", in_progress: "En progreso", new: "Nueva", news: "Noticia", published: "Publicado", spam: "Spam", superadmin: "Superadministrador", viewer: "Solo lectura",
 };
 
 export function StatusBadge({ value }: { value: keyof typeof labels | "active" | "inactive" }) {

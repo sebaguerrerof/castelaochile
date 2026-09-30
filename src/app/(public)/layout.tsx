@@ -1,5 +1,4 @@
 import { AnalyticsTracker } from "@/components/analytics/analytics-tracker";
-import { PublishedContentNavigation } from "@/components/content/published-content-navigation";
 import { Footer } from "@/components/layout/footer";
 import { Header } from "@/components/layout/header";
 import { FloatingWhatsApp } from "@/components/shared/floating-whatsapp";
@@ -12,7 +11,6 @@ export default async function PublicLayout({ children }: Readonly<{ children: Re
   return <>
     <a className="skip-link" href="#main-content">Saltar al contenido</a>
     <Header />
-    <PublishedContentNavigation />
     <main id="main-content">{children}</main>
     <Footer />
     <FloatingWhatsApp />

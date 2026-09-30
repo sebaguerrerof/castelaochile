@@ -24,9 +24,11 @@
 /PROMPT_*.md
 /AGENTS.md
 /CLAUDE.md
-# internal documentation remains local-only, except the required admin status
+# internal documentation remains local-only, except required implementation records
 /docs/*
 !/docs/ADMIN_REDESIGN_STATUS.md
+!/docs/CASTELAO_CHILE_BLOG.md
+!/docs/CASTELAO_CHILE_BLOG_STATUS.md
 
 # credentials, certificates, backups, and local reports
 *.pem

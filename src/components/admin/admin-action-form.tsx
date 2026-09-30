@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect, useState } from "react";
 
 import type { AdminActionState, AdminFormAction } from "@/lib/admin-action-state";
 
@@ -11,6 +11,12 @@ const fieldLabels: Record<string, string> = {
   body: "Contenido",
   coverAlt: "Texto alternativo",
   coverImagePath: "Portada",
+  categoryIds: "Categorías",
+  contentHtml: "Contenido",
+  authorName: "Autor",
+  publishedAt: "Fecha de publicación",
+  seoTitle: "Título SEO",
+  seoDescription: "Meta descripción",
   email: "Correo institucional",
   id: "Identificador",
   kind: "Tipo",
@@ -27,13 +33,22 @@ export function AdminActionForm({
   children,
   className,
   confirmMessage,
+  warnOnUnsavedChanges = false,
 }: {
   action: AdminFormAction;
   children: React.ReactNode;
   className: string;
   confirmMessage?: string;
+  warnOnUnsavedChanges?: boolean;
 }) {
   const [state, formAction] = useActionState(action, initialState);
+  const [dirty, setDirty] = useState(false);
+  useEffect(() => {
+    if (!warnOnUnsavedChanges || !dirty) return;
+    const guard = (event: BeforeUnloadEvent) => event.preventDefault();
+    window.addEventListener("beforeunload", guard);
+    return () => window.removeEventListener("beforeunload", guard);
+  }, [dirty, warnOnUnsavedChanges]);
   const fieldErrors = Object.entries(state.fieldErrors ?? {}).flatMap(([field, messages]) =>
     messages.map((message) => ({ field: fieldLabels[field] ?? field, message })),
   );
@@ -42,8 +57,10 @@ export function AdminActionForm({
     <form
       action={formAction}
       className={className}
+      onChange={() => { if (warnOnUnsavedChanges) setDirty(true); }}
       onSubmit={(event) => {
         if (confirmMessage && !window.confirm(confirmMessage)) event.preventDefault();
+        else setDirty(false);
       }}
     >
       {children}

@@ -87,7 +87,7 @@ export function Header() {
         <nav aria-label="Navegación principal" className="hidden xl:block">
           <ul className="flex items-center gap-5">
             {navigationItems.map((item) => {
-              const isActive = pathname === item.href;
+              const isActive = pathname === item.href || (item.href !== "/" && pathname.startsWith(`${item.href}/`));
 
               return (
                 <li key={item.href}>
@@ -128,7 +128,7 @@ export function Header() {
             <nav aria-label="Navegación móvil" className="py-4">
               <ul className="grid gap-1">
                 {navigationItems.map((item) => {
-                  const isActive = pathname === item.href;
+                  const isActive = pathname === item.href || (item.href !== "/" && pathname.startsWith(`${item.href}/`));
 
                   return (
                     <li key={item.href}>
