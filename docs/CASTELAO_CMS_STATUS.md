@@ -87,3 +87,16 @@ Se añadieron y aplicaron `20260930172631_public_design_card_links.sql` y `20260
 Validación de esta fase: **53 pruebas unitarias**, **45 comprobaciones públicas** y **63 comprobaciones del CMS**, todas aprobadas; lint, tipos, build y revisión de whitespace aprobados, auditoría de producción sin vulnerabilidades conocidas. Se conservan 232 artículos y no quedan fixtures de QA. Vista previa local en `http://localhost:3300`; frontend todavía sin desplegar.
 
 Especificación y comandos reproducibles: [PUBLIC_DESIGN_SYSTEM.md](./PUBLIC_DESIGN_SYSTEM.md). Los resultados anteriores de este documento corresponden a la fase inicial del CMS.
+
+## Despliegue para revisión del cliente — 30 de septiembre de 2026
+
+- Implementación subida a `origin/feature/admin-supabase-cms`: `ecd363f5f857c941b47f4da270f8acaa155a871d`.
+- Vercel Production **Ready**: `dpl_4TzmoQo6djtTTHyGxTGspcbxVzbC`, publicado en https://castelaochile.vercel.app. Build remoto aprobado con Next.js 16.3.6; entorno e instalación tomados del proyecto existente.
+- Producción usa el mismo proyecto Supabase validado. Las once migraciones locales/remotas coinciden, incluidas las cinco del CMS/diseño. Lectura anónima confirmada: nueve páginas, cuarenta bloques, un profesional y 232 artículos.
+- Lint, tipos, 53 pruebas y auditoría de dependencias aprobados antes del push. Auditoría sin vulnerabilidades conocidas.
+- **48 comprobaciones públicas aprobadas sobre la URL real**, en nueve anchos: navegación desktop/móvil, hover, teclado, movimiento reducido, páginas institucionales, Equipo, perfil, Blog y artículo. Resultados y capturas: `tmp/production-public-qa`.
+- Verificación adicional con prefetch normal: Inicio → Blog → artículo, búsqueda y página 2 correctos, sin errores JavaScript ni respuestas 500. `/admin/equipo` y `/admin/paginas` sin sesión redirigen al login. Robots y sitemap responden 200.
+- Se conserva `NEXT_PUBLIC_SITE_MODE=review` y noindex para presentar al cliente. El formulario conserva sus gates existentes; no se cambió el dominio ni la configuración editorial de publicación.
+- La prueba de subida/eliminación temporal de una foto desde el despliegue remoto fue bloqueada por la revisión automática de permisos. El usuario eligió cerrar con comprobaciones sin mutaciones de datos; no se ejecutó. La carga, guardado y privacidad del mismo código se validaron previamente en local con fixtures limpiados.
+
+Los documentos maestros del usuario, archivos temporales y variables de entorno quedaron fuera del commit y del upload de Vercel.
