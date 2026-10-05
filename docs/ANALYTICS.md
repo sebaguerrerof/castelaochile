@@ -57,3 +57,9 @@ La migración se validó inicialmente dentro de una transacción revertida, sin 
 - `ANALYTICS_ENABLED=true` en producción; revisión/noindex conservados. Ambas migraciones aplicadas y registradas.
 - Controles reales sin generar visitas: portada 200 y aviso visible, sin solicitudes de captura antes de aceptar, aviso detallado accesible, petición sin consentimiento 204, evento inválido 422, consentimiento desde origen externo 403 y panel sin sesión redirigido al login 307.
 - Redis PING correcto. Totales iniciales consultados: cero, al no existir captura previa. No se ejecutó una inserción sintética de eventos válidos en producción; las pruebas del flujo del navegador interceptaron la captura localmente.
+
+## Corrección del aviso del 5 de octubre de 2026
+
+Se reprodujo un cierre automático cuando la cookie se releía al recuperar el foco mientras el aviso estaba abierto. La visibilidad ahora tiene estado propio y solo cambia mediante los controles del visitante. El layout lee la preferencia en el servidor y la entrega como snapshot inicial para evitar parpadeos durante la hidratación. Una respuesta 204 no cierra el aviso si el navegador no guardó la cookie.
+
+Regresión en 1440 y 375 px: aviso presente en el HTML inicial sin elección, permanece abierto ante cambios de cookie/foco y navegación pública, aceptar cierra después de guardar, visitantes con elección recordada no ven un parpadeo al recargar, preferencias se pueden reabrir, y un guardado bloqueado mantiene el aviso con un error y permite reintentar. Captura interceptada durante estas pruebas; sin eventos ficticios en la base.

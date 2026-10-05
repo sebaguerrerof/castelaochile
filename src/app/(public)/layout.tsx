@@ -1,4 +1,6 @@
 import { AnalyticsTracker } from "@/components/analytics/analytics-tracker";
+import { cookies } from "next/headers";
+import { readAnalyticsConsent } from "@/lib/analytics-policy";
 import { Footer } from "@/components/layout/footer";
 import { Header } from "@/components/layout/header";
 import { FloatingWhatsApp } from "@/components/shared/floating-whatsapp";
@@ -12,6 +14,7 @@ import "./public-design.css";
 
 export default async function PublicLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   const analyticsEnabled = isAnalyticsEnabled();
+  const initialConsent = analyticsEnabled ? readAnalyticsConsent((await cookies()).toString()) : null;
   const [items, settings] = await Promise.all([getCmsNavigation(), getSiteSettings()]);
   return <div className="public-site">
     <a className="skip-link" href="#main-content">Saltar al contenido</a>
@@ -20,6 +23,6 @@ export default async function PublicLayout({ children }: Readonly<{ children: Re
     <main id="main-content">{children}</main>
     <Footer contact={settingsContact(settings)} items={items} notice={settings.footerNotice} />
     <FloatingWhatsApp whatsapp={settings.whatsapp || null} />
-    {analyticsEnabled && <AnalyticsTracker />}
+    {analyticsEnabled && <AnalyticsTracker initialConsent={initialConsent} />}
   </div>;
 }

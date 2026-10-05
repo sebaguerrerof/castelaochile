@@ -11,12 +11,13 @@ function subscribeConsent(callback: () => void) {
   return () => { window.removeEventListener(analyticsConsentEvent, callback); window.removeEventListener("focus", callback); };
 }
 function getConsent() { return readAnalyticsConsent(document.cookie) ?? "pending"; }
-const getServerConsent = () => "loading";
 
-export function AnalyticsTracker() {
+export function AnalyticsTracker({ initialConsent }: { initialConsent: "accepted" | "rejected" | null }) {
   const pathname = usePathname();
-  const consent = useSyncExternalStore(subscribeConsent, getConsent, getServerConsent);
-  const [preferencesOpen, setPreferencesOpen] = useState(false);
+  const consent = useSyncExternalStore(subscribeConsent, getConsent, () => initialConsent ?? "pending");
+  // Cookie synchronization may update tracking, but must never dismiss an open choice.
+  // The server supplies the first snapshot so returning visitors don't see a hydration flash.
+  const [preferencesOpen, setPreferencesOpen] = useState(initialConsent === null);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState("");
   const lastView = useRef<{ path: string; eventId: string } | null>(null);
@@ -61,6 +62,7 @@ export function AnalyticsTracker() {
     try {
       const response = await fetch("/api/analytics/consent", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ accepted }), credentials: "same-origin", cache: "no-store" });
       if (!response.ok) throw new Error("Consent could not be saved");
+      if (getConsent() !== (accepted ? "accepted" : "rejected")) throw new Error("Consent cookie was not stored");
       withdrawing.current = false;
       setPreferencesOpen(false);
       window.dispatchEvent(new Event(analyticsConsentEvent));
@@ -68,11 +70,11 @@ export function AnalyticsTracker() {
     finally { setPending(false); }
   }
 
-  const visible = consent !== "loading" && (consent === "pending" || preferencesOpen);
+  const visible = preferencesOpen;
   return <>
     <div className="analytics-preferences"><button aria-controls="analytics-consent" aria-expanded={visible} onClick={() => { setError(""); setPreferencesOpen(true); }} type="button">Preferencias de privacidad</button></div>
     {visible && <section aria-labelledby="analytics-consent-title" className="analytics-consent" id="analytics-consent">
-      <div><h2 id="analytics-consent-title">Tú decides sobre la analítica</h2><p>Con tu permiso, usamos una cookie durante 180 días para contar navegadores y conocer las páginas más visitadas. No guardamos tu IP ni datos de formularios. Puedes rechazarla o retirar tu permiso aquí cuando quieras.</p><Link href="/privacidad-analitica">Cómo funciona y qué guardamos</Link></div>
+      <div><h2 id="analytics-consent-title">Tú decides sobre la analítica</h2><p>Con tu permiso, usamos una cookie durante 180 días para contar navegadores y conocer las páginas más visitadas. No guardamos tu IP ni datos de formularios. Puedes rechazarla o retirar tu permiso aquí cuando quieras.</p>{consent !== "pending" && <p>Preferencia guardada: analítica {consent === "accepted" ? "aceptada" : "rechazada"}.</p>}<Link href="/privacidad-analitica">Cómo funciona y qué guardamos</Link></div>
       <div className="analytics-consent-actions"><button className="public-button analytics-choice" disabled={pending} onClick={() => void choose(false)} type="button">Rechazar analítica</button><button className="public-button analytics-choice" disabled={pending} onClick={() => void choose(true)} type="button">Aceptar analítica</button>{consent !== "pending" && <button disabled={pending} onClick={() => setPreferencesOpen(false)} type="button">Cerrar preferencias</button>}</div>
       {error && <p className="analytics-consent-error" role="alert">{error}</p>}
     </section>}
