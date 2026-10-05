@@ -28,6 +28,8 @@ export async function POST(request: NextRequest) {
     accepted = body.accepted;
   } catch { return new NextResponse(null, { status: 422 }); }
   if (accepted && !isAnalyticsEnabled()) return new NextResponse(null, { status: 503 });
+  // Only diagnostic flags; never log cookies, addresses or browser identifiers.
+  console.info(JSON.stringify({ feature: "analytics-consent", accepted, privacySignal: request.headers.get("dnt") === "1" || request.headers.get("sec-gpc") === "1" }));
   const response = new NextResponse(null, { status: 204, headers: { "Cache-Control": "no-store" } });
   const options = { path: "/", sameSite: "lax" as const, secure: new URL(request.url).protocol === "https:", maxAge: analyticsCookieLifetime };
   response.cookies.set(analyticsConsentCookie, accepted ? "accepted" : "rejected", options);

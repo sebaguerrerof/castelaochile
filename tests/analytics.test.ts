@@ -66,6 +66,18 @@ test("rate limiting and provider failure do not pretend successful collection", 
   assert.equal(await captureAnalytics(request(), visitor, dependencies({ throws: true })), 503);
 });
 
+test("capture diagnoses exclusion separately from persistence without exposing identities", async () => {
+  const outcomes: string[] = [];
+  const deps = { ...dependencies(), observe: (outcome: string) => outcomes.push(outcome) };
+  await captureAnalytics(request({ consent: "rejected" }), visitor, deps);
+  await captureAnalytics(request(), undefined, deps);
+  await captureAnalytics(request({ headers: { dnt: "1" } }), visitor, deps);
+  await captureAnalytics(request(), visitor, { ...deps, isStaff: async () => true });
+  await captureAnalytics(request(), visitor, deps);
+  await captureAnalytics(request(), visitor, { ...deps, persist: async () => false });
+  assert.deepEqual(outcomes, ["consent-required", "visitor-required", "privacy-or-bot", "staff", "recorded", "provider-error"]);
+});
+
 test("capture requires the canonical HTTPS production origin", () => {
   const site = "https://castelaochile.vercel.app";
   assert.equal(hasAnalyticsOrigin(request(), site, "production"), true);
