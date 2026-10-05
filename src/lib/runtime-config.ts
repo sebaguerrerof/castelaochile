@@ -25,7 +25,7 @@ export function hasApprovedContactPrivacy() {
   return runtimeConfig.contactPrivacyApproved && isHttpsUrl(runtimeConfig.contactPrivacyPolicyUrl) && Boolean(runtimeConfig.contactPrivacyConsentLabel?.trim());
 }
 export function isContactIntakeEnabled() { return runtimeConfig.isProductionSite && runtimeConfig.contactIntakeEnabled && hasApprovedContactPrivacy() && hasSupabaseSecretConfig() && hasSharedRateLimitConfig(); }
-export function isAnalyticsEnabled() { return runtimeConfig.isProductionSite && runtimeConfig.analyticsEnabled && hasSupabaseSecretConfig() && hasSharedRateLimitConfig(); }
+export function isAnalyticsEnabled() { return runtimeConfig.analyticsEnabled && process.env.VERCEL_ENV !== "preview" && hasSupabaseSecretConfig() && hasSharedRateLimitConfig(); }
 
 export class RuntimeConfigurationError extends Error {
   constructor(feature: string) { super(`${feature} is not configured.`); this.name = "RuntimeConfigurationError"; }

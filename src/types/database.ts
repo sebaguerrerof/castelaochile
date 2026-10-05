@@ -68,6 +68,8 @@ export type Database = {
     Functions: {
       save_cms_page: { Args: { p_page: Json }; Returns: string };
       record_page_view: { Args: { p_path: string; p_event_date: string }; Returns: undefined };
+      record_consented_page_view: { Args: { p_event_id: string; p_path: string; p_visitor_hash: string }; Returns: undefined };
+      get_web_analytics: { Args: { p_days: number }; Returns: Json };
       search_blog_posts: {
         Args: { p_query?: string; p_category?: string | null; p_offset?: number; p_limit?: number };
         Returns: Array<{ id: string; kind: ContentKind; slug: string; title: string; summary: string; cover_image_path: string | null; cover_alt: string | null; author_name: string | null; published_at: string; updated_at: string; reading_time_minutes: number | null; origin: ContentOrigin; category_names: string[]; category_slugs: string[]; total_count: number }>;

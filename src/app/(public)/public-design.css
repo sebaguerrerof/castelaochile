@@ -20,6 +20,23 @@
   text-wrap: pretty;
 }
 .public-site { background: white; }
+.analytics-preferences { background: var(--public-blue-ink); color: white; padding: .75rem 1.5rem; text-align: center; }
+.analytics-privacy { max-width: 52rem; padding-block: clamp(3rem, 6vw, 5rem); }
+.analytics-privacy h1 { color: var(--public-blue-ink); font-size: clamp(2rem, 4vw, 3rem); line-height: 1.15; margin-bottom: 1.5rem; }
+.analytics-privacy h2 { color: var(--public-blue-ink); font-size: 1.4rem; margin: 2rem 0 .75rem; }
+.analytics-privacy p { margin-bottom: 1rem; }
+.analytics-preferences button { color: inherit; font-size: .85rem; text-decoration: underline; text-underline-offset: .2em; }
+.analytics-consent { position: fixed; z-index: 70; inset: auto 1rem 1rem; display: grid; grid-template-columns: 1fr auto; gap: 1.25rem; max-width: 72rem; margin: auto; padding: 1.5rem; background: white; border: 1px solid var(--public-line); border-top: 4px solid var(--brand-blue); border-radius: .5rem; box-shadow: 0 8px 45px rgb(0 30 55 / 20%); }
+.analytics-consent h2 { margin: 0 0 .4rem; font-size: 1.25rem; color: var(--public-blue-ink); }
+.analytics-consent p { margin: 0 0 .5rem; max-width: 65ch; font-size: .9rem; line-height: 1.55; }
+.analytics-consent a { color: var(--public-blue-dark); font-size: .85rem; text-decoration: underline; }
+.analytics-consent-actions { display: flex; flex-direction: column; gap: .65rem; justify-content: center; min-width: 12rem; }
+.analytics-consent .analytics-choice { border: 1px solid var(--brand-blue); background: white; color: var(--public-blue-dark); min-height: 2.8rem; padding: .6rem 1rem; }
+.analytics-consent .analytics-choice:hover { background: var(--public-paper); }
+.analytics-consent button:disabled { opacity: .65; cursor: wait; }
+.analytics-consent button:focus-visible, .analytics-preferences button:focus-visible { outline: 3px solid var(--brand-orange); outline-offset: 3px; }
+.analytics-consent-error { color: #a02222; grid-column: 1 / -1; }
+@media (max-width: 640px) { .analytics-consent { grid-template-columns: 1fr; inset: auto .75rem .75rem; padding: 1.1rem; gap: .75rem; max-height: calc(100dvh - 1.5rem); overflow-y: auto; } .analytics-consent-actions { flex-direction: row; flex-wrap: wrap; } .analytics-consent-actions .analytics-choice { flex: 1; } }
 .public-site #main-content { min-height: 50vh; }
 .public-site .page-transition[data-page-transition="entering"] { animation: public-page-enter 220ms ease-out; }
 @keyframes public-page-enter { from { transform: translateY(4px); } to { transform: translateY(0); } }

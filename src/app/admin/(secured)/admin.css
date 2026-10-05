@@ -269,6 +269,17 @@
 .admin-chart-line { fill: none; stroke: var(--primary); stroke-linecap: round; stroke-linejoin: round; stroke-width: 3; }
 .admin-chart-area { fill: color-mix(in srgb, var(--primary) 10%, transparent); }
 .admin-chart-point { fill: var(--surface); stroke: var(--primary); stroke-width: 2; }
+.analytics-visitors-line { fill: none; stroke: #a76000; stroke-width: 3; stroke-dasharray: 7 4; stroke-linejoin: round; }
+.analytics-visitors-point { fill: #a76000; }
+.analytics-chart-axis { fill: var(--admin-muted); font-size: 11px; }
+.analytics-legend { display: flex; flex-wrap: wrap; gap: 1rem; margin-bottom: .75rem; font-size: .8rem; font-weight: 700; }
+.analytics-legend span:first-child { color: var(--primary); }
+.analytics-legend span:last-child { color: #a76000; }
+.analytics-daily-table { margin-top: 1rem; overflow-x: auto; font-size: .85rem; }
+.analytics-daily-table summary { cursor: pointer; color: var(--primary); font-weight: 700; padding: .5rem 0; }
+.analytics-daily-table table { width: 100%; border-collapse: collapse; margin-top: .75rem; }
+.analytics-daily-table th, .analytics-daily-table td { text-align: left; padding: .6rem; border-bottom: 1px solid var(--admin-border); }
+.analytics-daily-table caption { text-align: left; margin-bottom: .5rem; color: var(--muted); }
 .admin-chart-labels { display: flex; justify-content: space-between; gap: .5rem; margin-top: .6rem; color: var(--admin-muted); font-size: .68rem; }
 .admin-chart-sr-table { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 .admin-login-page, .admin-runtime-unavailable { display: grid; min-height: 100dvh; place-items: center; background: var(--admin-canvas, #f4f7f9); padding: 1.5rem; }

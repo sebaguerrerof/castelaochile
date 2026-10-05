@@ -1,4 +1,4 @@
-import { Clock3, Eye, FilePenLine, FileText, Inbox, Newspaper, Plus, Users } from "lucide-react";
+import { Eye, FilePenLine, FileText, Inbox, Newspaper, Plus, Users } from "lucide-react";
 import Link from "next/link";
 
 import { AnalyticsChart } from "@/components/admin/analytics-chart";
@@ -13,8 +13,8 @@ export default async function AdminDashboardPage() {
   const intakeEnabled = isContactIntakeEnabled();
   const includeConsultations = admin.role !== "viewer";
   const [overview, analytics] = await Promise.all([
-    getDashboardOverview({ includeAnalytics: analyticsEnabled, includeConsultations }),
-    analyticsEnabled ? getAnalytics(7) : Promise.resolve(null),
+    getDashboardOverview({ includeAnalytics: false, includeConsultations }),
+    analyticsEnabled ? getAnalytics(7).catch(() => null) : Promise.resolve(null),
   ]);
   const formatDate = (value: string) => new Intl.DateTimeFormat("es-CL", { dateStyle: "medium", timeZone: "America/Santiago" }).format(new Date(value));
 
@@ -22,15 +22,16 @@ export default async function AdminDashboardPage() {
     <>
       <PageHeader description="Panorama operativo con información real del CMS, consultas y analítica first-party." eyebrow="Panel privado" title="Resumen" />
       <section className="admin-metric-grid" aria-label="Indicadores reales">
-        <MetricCard detail={analyticsEnabled ? "Desde las 00:00, America/Santiago" : "Captura desactivada por configuración"} icon={Eye} label="Vistas hoy" value={analyticsEnabled ? overview.todayViews : "—"} />
-        <MetricCard detail={analyticsEnabled ? "Acumulado de los últimos 7 días" : "Gate de privacidad cerrado"} icon={Clock3} label="Vistas 7 días" value={analyticsEnabled ? overview.weekViews : "—"} />
+        <MetricCard detail="Con consentimiento · America/Santiago" icon={Users} label="Navegadores hoy" value={analytics?.todayVisitors ?? "—"} />
+        <MetricCard detail="Sin duplicar entre días o páginas" icon={Users} label="Navegadores únicos (7 días)" value={analytics?.visitors ?? "—"} />
+        <MetricCard detail="Vistas consentidas de los últimos 7 días" icon={Eye} label="Vistas 7 días" value={analytics?.totalViews ?? "—"} />
         {includeConsultations && <MetricCard detail={intakeEnabled ? "Pendientes de revisión" : "Recepción pública desactivada"} icon={Inbox} label="Consultas nuevas" value={intakeEnabled ? overview.newConsultations : "—"} />}
         <MetricCard detail="Pendientes de publicación" icon={FilePenLine} label="Borradores" value={overview.drafts} />
         <MetricCard detail="Visibles en el sitio público" icon={Newspaper} label="Publicados" value={overview.published} />
       </section>
       <div className="admin-dashboard-grid">
-        <AdminPanel description="Evolución diaria, sin cookies ni identificadores persistentes." title="Actividad de los últimos 7 días">
-          {analytics ? <AnalyticsChart points={analytics.dailyPoints} /> : <StatePanel description="El pipeline existe, pero la captura permanece apagada hasta que se aprueben la configuración y el gate de privacidad." title="Analítica aún no habilitada" tone="disabled" />}
+        <AdminPanel description="Solo visitas con consentimiento. Consulta el detalle en Analítica." title="Actividad de los últimos 7 días">
+          {analytics ? <><AnalyticsChart points={analytics.dailyPoints} /><Link className="admin-button admin-button-secondary" href="/admin/analitica">Ver analítica completa</Link></> : <StatePanel description={analyticsEnabled ? "Las cifras no están disponibles temporalmente. Actualiza para reintentar." : "La captura está desactivada por configuración."} title={analyticsEnabled ? "Cifras no disponibles" : "Analítica aún no habilitada"} tone={analyticsEnabled ? "error" : "disabled"} />}
         </AdminPanel>
         <div className="admin-stack">
           <AdminPanel title="Acciones rápidas">

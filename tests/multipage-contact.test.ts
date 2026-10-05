@@ -39,5 +39,5 @@ test("the contact form is real but remains closed until its privacy gate is appr
 
 test("published CMS and aggregate analytics have no direct browser table writes", () => {
   const content = source("src/lib/repositories/content-repository.ts"); const analytics = source("src/app/api/analytics/route.ts"); const tracker = source("src/components/analytics/analytics-tracker.tsx");
-  assert.match(content, /eq\("status", "published"\)/); assert.match(analytics, /createAdminSupabaseClient\(\)\.rpc/); assert.match(tracker, /pathname\.startsWith\("\/admin"\)/); assert.doesNotMatch(tracker, /localStorage|document\.cookie/);
+  assert.match(content, /eq\("status", "published"\)/); assert.match(analytics, /createAdminSupabaseClient\(\)\.rpc/); assert.match(tracker, /pathname\.startsWith\("\/admin"\)/); assert.doesNotMatch(tracker, /localStorage/); assert.match(tracker, /consent !== "accepted"/);
 });

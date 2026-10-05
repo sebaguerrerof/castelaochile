@@ -1,4 +1,5 @@
 import "server-only";
+import { webAnalyticsSchema } from "@/lib/analytics-report";
 
 import { isBlogSchemaUnavailable } from "@/lib/blog/schema-compatibility";
 import { createAdminSupabaseClient } from "@/lib/supabase/admin";
@@ -142,36 +143,9 @@ export async function getConsultation(id: string) {
 
 export async function getAnalytics(days: number) {
   const supabase = await createServerSupabaseClient();
-  const dateAtOffset = (offset: number) => {
-    const date = new Date();
-    date.setDate(date.getDate() + offset);
-    return date.toLocaleDateString("en-CA", { timeZone: "America/Santiago" });
-  };
-  const startDate = dateAtOffset(-(days - 1));
-  const previousStartDate = dateAtOffset(-(days * 2 - 1));
-  const [{ data: analytics, error: analyticsError }, { count: contactCount, error: contactsError }] = await Promise.all([
-    supabase.from("analytics_daily").select("event_date, path, page_views, updated_at").gte("event_date", previousStartDate).order("event_date", { ascending: true }),
-    supabase.from("contact_submissions").select("id", { count: "exact", head: true }).gte("submitted_at", `${startDate}T00:00:00-03:00`),
-  ]);
-  if (analyticsError || contactsError) throw new Error("Could not load analytics.");
-  const current = analytics.filter((row) => row.event_date >= startDate);
-  const previous = analytics.filter((row) => row.event_date < startDate);
-  const dailyPoints = Array.from({ length: days }, (_, index) => {
-    const date = dateAtOffset(-(days - 1) + index);
-    return { date, value: current.filter((row) => row.event_date === date).reduce((total, row) => total + row.page_views, 0) };
-  });
-  const topPages = [...current.reduce((map, row) => map.set(row.path, (map.get(row.path) ?? 0) + row.page_views), new Map<string, number>())]
-    .map(([path, pageViews]) => ({ path, pageViews }))
-    .sort((a, b) => b.pageViews - a.pageViews)
-    .slice(0, 10);
-  return {
-    analytics: current,
-    contactCount: contactCount ?? 0,
-    dailyPoints,
-    previousViews: previous.reduce((total, row) => total + row.page_views, 0),
-    startDate,
-    topPages,
-  };
+  const { data, error } = await supabase.rpc("get_web_analytics", { p_days: days });
+  if (error) throw new Error("Could not load analytics.");
+  return webAnalyticsSchema.parse(data);
 }
 
 export async function listStaffUsers() {
