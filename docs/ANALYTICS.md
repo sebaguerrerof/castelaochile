@@ -48,3 +48,12 @@ Migración `20261005140314_visitor_analytics.sql`:
 QA de navegador en 1440 y 375 px con eventos interceptados: ninguna captura previa al consentimiento, rechazo persistente, creación de cookie HttpOnly al aceptar, reintentos, navegación con identidad estable, retirada y eliminación del identificador, aviso responsive, errores de consentimiento y origen externo. Sin visitas ficticias en producción.
 
 La migración se validó inicialmente dentro de una transacción revertida, sin crear eventos de prueba. Después de aplicarla se consultó la RPC con rol authenticated y una cuenta de staff existente, comprobando cifras vacías reales; job de retención activo y advisors de seguridad sin incidencias. La migración adicional `20261005143538_analytics_service_permissions.sql` permite que el servidor evalúe el predicado interno de staff al planificar la RPC; no cambia permisos anónimos ni autorización del CMS. Las consultas de 7/30/90 días, la denegación a anon y el rechazo de rutas inválidas se verifican sin insertar eventos.
+
+## Publicación del 5 de octubre de 2026
+
+- Código: commit `41f7a8a`, subido a `feature/admin-supabase-cms`.
+- Vercel producción Ready: `dpl_GgFQCqcDSuqDdbvp9b9hneVFPCkD`.
+- URL pública: https://castelaochile.vercel.app; panel https://castelaochile.vercel.app/admin/analitica.
+- `ANALYTICS_ENABLED=true` en producción; revisión/noindex conservados. Ambas migraciones aplicadas y registradas.
+- Controles reales sin generar visitas: portada 200 y aviso visible, sin solicitudes de captura antes de aceptar, aviso detallado accesible, petición sin consentimiento 204, evento inválido 422, consentimiento desde origen externo 403 y panel sin sesión redirigido al login 307.
+- Redis PING correcto. Totales iniciales consultados: cero, al no existir captura previa. No se ejecutó una inserción sintética de eventos válidos en producción; las pruebas del flujo del navegador interceptaron la captura localmente.
