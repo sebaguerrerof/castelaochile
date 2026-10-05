@@ -18,7 +18,7 @@ La captura está apagada por defecto en cada navegador. Los botones Aceptar y Re
 - `castelao_analytics_consent`: elección aceptada/rechazada, SameSite=Lax, ruta `/`, duración de 180 días.
 - `castelao_analytics_visitor`: UUID aleatorio, HttpOnly, SameSite=Lax, Secure en HTTPS, duración de 180 días; se crea solo al aceptar y se elimina al rechazar.
 - La base guarda únicamente un hash del UUID, ID del evento, ruta sin parámetros, fecha local y timestamp. No guarda IP, user agent, búsquedas, datos de formularios, correos ni asociación a cuentas.
-- Se respetan DNT y GPC, se excluyen robots conocidos, navegadores automatizados, usuarios autenticados del CMS, rutas `/admin` y `/api`.
+- Se respetan DNT y GPC; se excluyen robots conocidos, navegadores automatizados y rutas `/admin` y `/api`. Una sesión guardada del CMS no excluye una visita consentida a una página pública.
 - El limitador Redis usa claves hash transitorias por red y navegador (60 segundos); no se persisten IP sin transformar.
 - Retirar el permiso detiene solicitudes futuras y elimina la cookie identificadora. Los registros anteriores siguen su plazo de retención.
 
@@ -63,3 +63,9 @@ La migración se validó inicialmente dentro de una transacción revertida, sin 
 Se reprodujo un cierre automático cuando la cookie se releía al recuperar el foco mientras el aviso estaba abierto. La visibilidad ahora tiene estado propio y solo cambia mediante los controles del visitante. El layout lee la preferencia en el servidor y la entrega como snapshot inicial para evitar parpadeos durante la hidratación. Una respuesta 204 no cierra el aviso si el navegador no guardó la cookie.
 
 Regresión en 1440 y 375 px: aviso presente en el HTML inicial sin elección, permanece abierto ante cambios de cookie/foco y navegación pública, aceptar cierra después de guardar, visitantes con elección recordada no ven un parpadeo al recargar, preferencias se pueden reabrir, y un guardado bloqueado mantiene el aviso con un error y permite reintentar. Captura interceptada durante estas pruebas; sin eventos ficticios en la base.
+
+## Corrección de captura del 5 de octubre de 2026
+
+Una visita real del usuario fue excluida con resultado `staff`: el endpoint descartaba cualquier navegador con sesión Supabase guardada, aunque la navegación y el consentimiento fueran públicos. Se elimina ese filtro por sesión. La exclusión de rutas privadas se mantiene en el tracker, la validación del endpoint y la función SQL; el panel continúa exigiendo autorización de staff activo.
+
+Los diagnósticos solo registran motivos estáticos y códigos de error del proveedor, sin cookies, UUID, hashes, IP, rutas ni datos del visitante. Las pruebas cubren una visita pública con cookie de sesión guardada y el rechazo de rutas privadas con esa misma cookie. La migración real se probó adicionalmente en Postgres aislado en memoria con rol service_role: 2 navegadores, 3 vistas y reintentos deduplicados. No se añadieron eventos sintéticos a producción.

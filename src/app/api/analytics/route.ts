@@ -5,7 +5,6 @@ import { isAnalyticsEnabled, runtimeConfig } from "@/lib/runtime-config";
 import { captureAnalytics } from "@/lib/server/analytics";
 import { UpstashRateLimiter } from "@/lib/server/rate-limit";
 import { createAdminSupabaseClient } from "@/lib/supabase/admin";
-import { createServerSupabaseClient } from "@/lib/supabase/server";
 
 export const runtime = "nodejs";
 
@@ -18,13 +17,6 @@ export async function POST(request: NextRequest) {
   const networkLimiter = new UpstashRateLimiter(runtimeConfig.upstashUrl!, runtimeConfig.upstashToken!, { maxRequests: 300, windowSeconds: 60 });
   const status = await captureAnalytics(request, request.cookies.get(analyticsVisitorCookie)?.value, {
     observe: report,
-    isStaff: async () => {
-      if (!request.cookies.getAll().some(({ name }) => name.startsWith("sb-"))) return false;
-      const supabase = await createServerSupabaseClient();
-      const { data, error } = await supabase.auth.getUser();
-      if (error && error.name !== "AuthSessionMissingError") throw error;
-      return Boolean(data.user);
-    },
     allow: async (key) => {
       const network = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || request.headers.get("x-real-ip") || "unknown";
       if (!(await networkLimiter.check(`analytics-network:${network}`)).allowed) return false;

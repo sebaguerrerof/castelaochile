@@ -9,9 +9,9 @@ const visitor = randomUUID();
 function request({ consent = "accepted", headers = {}, body = { event: "page_view", eventId: randomUUID(), path: "/blog" } }: { consent?: string; headers?: Record<string, string>; body?: unknown } = {}) {
   return new Request("https://castelaochile.vercel.app/api/analytics", { method: "POST", headers: { origin: "https://castelaochile.vercel.app", cookie: `${analyticsConsentCookie}=${consent}`, ...headers }, body: JSON.stringify(body) });
 }
-function dependencies({ staff = false, allowed = true, throws = false } = {}) {
+function dependencies({ allowed = true, throws = false } = {}) {
   const writes: AnalyticsWrite[] = [];
-  return { writes, isStaff: async () => staff, allow: async () => allowed, persist: async (write: AnalyticsWrite) => { if (throws) throw new Error("offline"); writes.push(write); return true; } };
+  return { writes, allow: async () => allowed, persist: async (write: AnalyticsWrite) => { if (throws) throw new Error("offline"); writes.push(write); return true; } };
 }
 
 test("unknown, rejected or malformed consent cannot persist an event", async () => {
@@ -26,15 +26,23 @@ test("unknown, rejected or malformed consent cannot persist an event", async () 
   assert.equal(deps.writes.length, 0);
 });
 
-test("robots, DNT, GPC and signed-in staff are excluded", async () => {
+test("robots, DNT and GPC are excluded", async () => {
   for (const headers of [{ "user-agent": "Googlebot" }, { "user-agent": "HeadlessChrome" }, { dnt: "1" }, { "sec-gpc": "1" }]) {
     const deps = dependencies();
     assert.equal(await captureAnalytics(request({ headers }), visitor, deps), 204);
     assert.equal(deps.writes.length, 0);
   }
-  const deps = dependencies({ staff: true });
-  assert.equal(await captureAnalytics(request(), visitor, deps), 204);
-  assert.equal(deps.writes.length, 0);
+});
+
+test("a saved CMS session cannot suppress a consented public visit or admit private routes", async () => {
+  const deps = dependencies();
+  const headers = { cookie: `${analyticsConsentCookie}=accepted; sb-project-auth-token=saved-session` };
+  assert.equal(await captureAnalytics(request({ headers }), visitor, deps), 204);
+  assert.equal(deps.writes.length, 1);
+  for (const path of ["/admin", "/admin/analitica", "/api/analytics"]) {
+    assert.equal(await captureAnalytics(request({ headers, body: { event: "page_view", eventId: randomUUID(), path } }), visitor, deps), 422);
+  }
+  assert.equal(deps.writes.length, 1);
 });
 
 test("a consented navigation persists only a stable hashed identity, path and event ID", async () => {
@@ -72,10 +80,9 @@ test("capture diagnoses exclusion separately from persistence without exposing i
   await captureAnalytics(request({ consent: "rejected" }), visitor, deps);
   await captureAnalytics(request(), undefined, deps);
   await captureAnalytics(request({ headers: { dnt: "1" } }), visitor, deps);
-  await captureAnalytics(request(), visitor, { ...deps, isStaff: async () => true });
   await captureAnalytics(request(), visitor, deps);
   await captureAnalytics(request(), visitor, { ...deps, persist: async () => false });
-  assert.deepEqual(outcomes, ["consent-required", "visitor-required", "privacy-or-bot", "staff", "recorded", "provider-error"]);
+  assert.deepEqual(outcomes, ["consent-required", "visitor-required", "privacy-or-bot", "recorded", "provider-error"]);
 });
 
 test("capture requires the canonical HTTPS production origin", () => {

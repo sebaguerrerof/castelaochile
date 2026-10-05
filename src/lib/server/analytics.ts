@@ -2,9 +2,8 @@ import { createHash } from "node:crypto";
 import { analyticsEventSchema, excludesAnalytics, readAnalyticsConsent, visitorIdSchema } from "../analytics-policy.ts";
 
 export type AnalyticsWrite = { p_event_id: string; p_path: string; p_visitor_hash: string };
-export type AnalyticsOutcome = "consent-required" | "visitor-required" | "privacy-or-bot" | "invalid-event" | "staff" | "rate-limited" | "recorded" | "provider-error";
+export type AnalyticsOutcome = "consent-required" | "visitor-required" | "privacy-or-bot" | "invalid-event" | "rate-limited" | "recorded" | "provider-error";
 export type AnalyticsDependencies = {
-  isStaff: () => Promise<boolean>;
   allow: (key: string) => Promise<boolean>;
   persist: (event: AnalyticsWrite) => Promise<boolean>;
   observe?: (outcome: AnalyticsOutcome) => void;
@@ -37,7 +36,8 @@ export async function captureAnalytics(request: Request, visitorId: string | und
   const parsed = analyticsEventSchema.safeParse(input);
   if (!parsed.success) return finish(422, "invalid-event");
   try {
-    if (await dependencies.isStaff()) return finish(204, "staff");
+    // Scope is the public route, not the browser's unrelated CMS session.
+    // The event schema excludes /admin and /api before any provider is called.
     const visitorHash = createHash("sha256").update(`castelao-analytics:${visitorId}`).digest("hex");
     if (!await dependencies.allow(visitorHash)) return finish(429, "rate-limited");
     return await dependencies.persist({ p_event_id: parsed.data.eventId, p_path: parsed.data.path, p_visitor_hash: visitorHash }) ? finish(204, "recorded") : finish(503, "provider-error");
