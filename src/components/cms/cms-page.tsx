@@ -1,13 +1,14 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, ArrowUpRight, Check, LockKeyhole, ShieldAlert } from "lucide-react";
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import type { Metadata } from "next";
 import { Container } from "@/components/layout/container";
 import { Section } from "@/components/layout/section";
 import { Breadcrumbs } from "@/components/shared/breadcrumbs";
 import { SectionHeading } from "@/components/shared/section-heading";
 import { ContactActions } from "@/components/shared/contact-actions";
+import { EditorialParagraphs } from "@/components/shared/editorial-paragraphs";
 import { WhatsAppIcon } from "@/components/shared/whatsapp-icon";
 import { buttonVariants } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -18,6 +19,7 @@ import { getContactActions, whatsappHref } from "@/lib/contact-links";
 import { getCmsPage, getSiteSettings, listProfessionals, settingsContact } from "@/lib/cms/repository";
 import { createPageMetadata } from "@/lib/page-metadata";
 import { siteConfig } from "@/config/site";
+import { formatContactNumber } from "@/lib/format-contact-number";
 import type { BlockData, CmsBlock, SiteSettings } from "@/lib/cms/schemas";
 import type { CmsPage } from "@/lib/cms/repository";
 import type { ProfessionalRow } from "@/types/cms";
@@ -30,7 +32,7 @@ export function CmsCta({ cta, settings, inverted = false, secondary = false }: {
   const href = cta.target === "whatsapp" ? whatsappHref(settings.whatsapp) : cta.target === "evaluation" ? settings.evaluationUrl : cta.href;
   if (!href) return null;
   const classes = buttonVariants({ variant: inverted ? secondary ? "invertedOutline" : "inverted" : secondary || cta.target === "whatsapp" ? "outline" : "primary", className: "public-button" });
-  const content = <>{cta.target === "evaluation" ? settings.evaluationLabel : cta.label}{cta.target === "whatsapp" ? <WhatsAppIcon className="public-button__icon" /> : <ArrowRight size={18} />}</>;
+  const content = <>{cta.label || settings.evaluationLabel}{cta.target === "whatsapp" ? <WhatsAppIcon className="public-button__icon" /> : <ArrowRight size={18} />}</>;
   return href.startsWith("/") ? <Link className={classes} href={href}>{content}</Link> : <a className={classes} href={href} rel="noopener noreferrer" target="_blank">{content}</a>;
 }
 
@@ -44,7 +46,8 @@ function Hero({ data, settings, page }: { data: BlockData<"hero">; settings: Sit
       <div className="cms-hero__copy">
         {data.eyebrow && <p className="eyebrow cms-hero__eyebrow"><span />{data.eyebrow}</p>}
         <h1>{data.title}</h1>
-        {data.description && <p className="cms-hero__description">{data.description}</p>}
+        {data.subtitle && <p className="cms-hero__subtitle">{data.subtitle}</p>}
+        <EditorialParagraphs text={data.description} className="cms-hero__description" />
         <div className="cms-hero__actions">{data.primaryCta && <CmsCta cta={data.primaryCta} inverted={inverted} settings={settings} />}{data.secondaryCta && <CmsCta cta={data.secondaryCta} inverted={inverted} secondary settings={settings} />}</div>
       </div>
     </Container>
@@ -58,18 +61,19 @@ export function ProfessionalIdentity({ person, className = "" }: { person: Profe
   </div>;
 }
 
-export function TeamGrid({ professionals }: { professionals: ProfessionalRow[] }) {
+export function TeamGrid({ professionals, preview = false, headingLevel = 3 }: { professionals: ProfessionalRow[]; preview?: boolean; headingLevel?: 2 | 3 }) {
+  const Heading = headingLevel === 2 ? "h2" : "h3";
   return <div className="cms-team-grid" data-count={professionals.length}>{professionals.map((person) => <article className="cms-team-card" key={person.id}>
     <ProfessionalIdentity person={person} />
-    <div className="cms-team-card__body"><p className="eyebrow">{person.role}</p><h3>{person.full_name}</h3>
+    <div className="cms-team-card__body"><p className="eyebrow">{person.role}</p><Heading>{person.full_name}</Heading>
       {person.credentials.length > 0 && <ul className="cms-team-card__credentials">{person.credentials.map((credential) => <li key={credential}>{credential}</li>)}</ul>}
       {person.short_bio && <p className="cms-team-card__bio">{person.short_bio}</p>}
-      <Link className="public-text-link" href={"/equipo/" + person.slug}>Conocer perfil<ArrowUpRight size={18} /></Link>
+      <Link className="public-text-link" href={preview ? `/admin/vista-previa/equipo/${person.id}` : "/equipo/" + person.slug}>Conocer perfil<ArrowUpRight size={18} /></Link>
     </div>
   </article>)}</div>;
 }
 
-type RenderContext = { settings: SiteSettings; professionals: ProfessionalRow[] };
+type RenderContext = { settings: SiteSettings; professionals: ProfessionalRow[]; preview: boolean };
 function BlockContent({ block, context }: { block: CmsBlock; context: RenderContext }) {
   const { settings, professionals } = context;
   switch (block.section_type) {
@@ -77,7 +81,8 @@ function BlockContent({ block, context }: { block: CmsBlock; context: RenderCont
     case "rich_text": return <div className="cms-prose"><SafeHtml value={block.data.html} /></div>;
     case "text_image": return <div className="cms-text-image"><div className="cms-prose"><SafeHtml value={block.data.html} /></div><figure><Image alt={block.data.image.alt} height={900} sizes="(max-width: 767px) 100vw, 45vw" src={block.data.image.src} unoptimized={block.data.image.src.startsWith("/api/")} width={800} /><figcaption>{block.data.image.alt}</figcaption></figure></div>;
     case "feature_cards": case "principles": case "steps": return <div className={"cms-card-grid cms-card-grid--" + block.section_type} data-count={block.data.items.length}>{block.data.items.map((item, index) => {
-      const contents = <><span aria-hidden="true" className="cms-card__index">{String(index + 1).padStart(2, "0")}</span><h3>{item.title}</h3>{item.description && <p>{item.description}</p>}{item.href && <ArrowUpRight aria-hidden="true" className="cms-card__arrow" size={20} />}</>;
+      const Heading = block.data.showTitle === false ? "h2" : "h3";
+      const contents = <><span aria-hidden="true" className="cms-card__index">{String(index + 1).padStart(2, "0")}</span><Heading>{item.title}</Heading>{item.subtitle && <p className="cms-card__subtitle">{item.subtitle}</p>}<EditorialParagraphs text={item.description} className="cms-card__description" />{item.href && item.linkLabel && <span className="public-text-link">{item.linkLabel}</span>}{item.href && <ArrowUpRight aria-hidden="true" className="cms-card__arrow" size={20} />}</>;
       return item.href ? <Link className="cms-card cms-card--link" href={item.href} key={index}>{contents}</Link> : <article className="cms-card" key={index}>{contents}</article>;
     })}</div>;
     case "stats": return <dl className="cms-stats" data-count={block.data.items.length}>{block.data.items.map((item, index) => <div key={index}><dt>{item.label}</dt><dd>{item.value}</dd></div>)}</dl>;
@@ -85,11 +90,11 @@ function BlockContent({ block, context }: { block: CmsBlock; context: RenderCont
     case "cta": return <div className="cms-cta__actions"><CmsCta cta={block.data.primaryCta} inverted settings={settings} />{block.data.secondaryCta && <CmsCta cta={block.data.secondaryCta} inverted secondary settings={settings} />}</div>;
     case "warning": return null;
     case "faq": return <div className="cms-faq"><Accordion collapsible type="single">{block.data.items.filter((item) => item.is_enabled).map((item, index) => <AccordionItem key={index} value={"faq-" + index}><AccordionTrigger>{item.question}</AccordionTrigger><AccordionContent>{item.answer}</AccordionContent></AccordionItem>)}</Accordion><JsonLd data={{ "@context": "https://schema.org", "@type": "FAQPage", mainEntity: block.data.items.filter((item) => item.is_enabled).map((item) => ({ "@type": "Question", name: item.question, acceptedAnswer: { "@type": "Answer", text: item.answer } })) }} /></div>;
-    case "team_preview": return <><TeamGrid professionals={professionals.filter((person) => !block.data.featuredOnly || person.is_featured)} />{block.data.featuredOnly && <Link className="public-text-link cms-team-link" href="/equipo">Conoce a nuestro equipo<ArrowRight size={18} /></Link>}</>;
+    case "team_preview": return <><TeamGrid headingLevel={block.data.showTitle ? 3 : 2} preview={context.preview} professionals={professionals.filter((person) => !block.data.featuredOnly || person.is_featured)} />{block.data.featuredOnly && <Link className="public-text-link cms-team-link" href="/equipo">Conoce a nuestro equipo<ArrowRight size={18} /></Link>}</>;
     case "gallery": return <div className="cms-gallery">{block.data.images.map((image, index) => <figure key={index}><Image alt={image.alt} height={600} sizes="(max-width: 767px) 100vw, 33vw" src={image.src} unoptimized={image.src.startsWith("/api/")} width={800} /><figcaption>{image.alt}</figcaption></figure>)}</div>;
     case "contact": {
       const enabled = isContactIntakeEnabled();
-      return <div className="cms-contact"><div className="cms-contact__channels"><ContactActions actions={getContactActions(settingsContact(settings))} />{settings.streetAddress && <p>{settings.streetAddress}</p>}{settings.email && <a className="public-text-link" href={"mailto:" + settings.email}>{settings.email}<ArrowUpRight size={16} /></a>}</div>
+      return <div className="cms-contact"><div className="cms-contact__channels"><ContactActions actions={getContactActions(settingsContact(settings))} />{settings.whatsapp && <p className="cms-contact__number">WhatsApp: {formatContactNumber(settings.whatsapp)}</p>}{settings.streetAddress && <p>{settings.streetAddress}</p>}{settings.email && <a className="public-text-link" href={"mailto:" + settings.email}>{settings.email}<ArrowUpRight size={16} /></a>}</div>
         {enabled ? <ContactForm consentLabel={runtimeConfig.contactPrivacyConsentLabel ?? null} enabled privacyPolicyUrl={runtimeConfig.contactPrivacyPolicyUrl ?? null} /> : <aside className="cms-contact__privacy"><LockKeyhole aria-hidden="true" size={26} /><h3>Tu privacidad importa</h3><p>Al contactarnos, comparte solo información general. Los antecedentes de salud se conversan durante una evaluación profesional.</p></aside>}
       </div>;
     }
@@ -98,28 +103,41 @@ function BlockContent({ block, context }: { block: CmsBlock; context: RenderCont
 
 // Exhaustive typed registry: CMS edits use the same rendering in public and private preview.
 export const sectionRegistry = Object.freeze(["hero", "rich_text", "text_image", "feature_cards", "principles", "steps", "stats", "pricing", "cta", "warning", "faq", "team_preview", "gallery", "contact"] as const);
-export async function CmsPageView({ page }: { page: CmsPage }) {
-  const [settings, professionals] = await Promise.all([getSiteSettings(), listProfessionals()]);
-  const context = { settings, professionals };
-  return <div className="cms-page" data-page={page.slug}>{page.sections.map((block) => {
+export async function CmsPageView({ page, preview = false, previewLinks = {} }: { page: CmsPage; preview?: boolean; previewLinks?: Record<string, string> }) {
+  const [originalSettings, allProfessionals] = await Promise.all([getSiteSettings(preview), listProfessionals(preview)]);
+  const settings = { ...originalSettings, evaluationUrl: previewLinks[originalSettings.evaluationUrl] ?? originalSettings.evaluationUrl };
+  const professionals = preview ? allProfessionals.filter(person => person.status !== "archived" && (person.status === "published" || person.draft_updated_at)) : allProfessionals;
+  const context = { settings, professionals, preview };
+  const sections = preview ? mapPreviewLinks(page.sections, previewLinks) as CmsBlock[] : page.sections;
+  return <div className="cms-page" data-page={page.slug}>{sections.map((block) => {
     if (block.section_type === "hero") return <Hero data={block.data} key={block.id} page={page} settings={settings} />;
-    if (block.section_type === "warning") return <Section className="cms-warning" key={block.id}><div className="cms-warning__inner"><ShieldAlert aria-hidden="true" size={26} /><div><h2>{block.data.title}</h2>{block.data.description && <p>{block.data.description}</p>}</div></div></Section>;
-    if (block.section_type === "cta") return <Section className="cms-cta" key={block.id}><div className="cms-cta__inner"><SectionHeading className="cms-section-heading" description={block.data.description} inverted title={block.data.title} /><BlockContent block={block} context={context} /></div></Section>;
+    if (block.section_type === "warning") return <Section className="cms-warning" key={block.id}><div className="cms-warning__inner"><ShieldAlert aria-hidden="true" size={26} /><div><h2>{block.data.title}</h2><EditorialParagraphs text={block.data.description} className="cms-warning__description" /></div></div></Section>;
+    if (block.section_type === "cta") return <Section className={"cms-cta" + (block.data.showTitle ? "" : " cms-section--untitled")} key={block.id}><div className="cms-cta__inner"><SectionHeading className="cms-section-heading" description={block.data.description} inverted showTitle={block.data.showTitle} subtitle={block.data.subtitle} title={block.data.title} /><BlockContent block={block} context={context} /></div></Section>;
     const editorial = ["rich_text", "pricing", "faq", "contact"].includes(block.section_type);
-    return <Section className={"cms-section cms-section--" + block.section_type} key={block.id}><div className={editorial ? "cms-editorial" : undefined}><SectionHeading className="cms-section-heading" description={block.data.description} title={block.data.title} /><div className="cms-section-content"><BlockContent block={block} context={context} /></div></div></Section>;
+    return <Section className={"cms-section cms-section--" + block.section_type + (block.data.showTitle ? "" : " cms-section--untitled")} key={block.id}><div className={editorial ? "cms-editorial" : undefined}><SectionHeading className="cms-section-heading" description={block.data.description} showTitle={block.data.showTitle} subtitle={block.data.subtitle} title={block.data.title} /><div className="cms-section-content"><BlockContent block={block} context={context} /></div></div></Section>;
   })}</div>;
 }
-export async function CmsRoute({ slug }: { slug: string }) {
+export async function CmsRoute({ slug, requestedPath }: { slug: string; requestedPath?: string }) {
   const page = await getCmsPage(slug);
   if (!page) notFound();
+  if (requestedPath && page.path !== requestedPath) permanentRedirect(page.path);
   return <CmsPageView page={page} />;
 }
 export async function cmsMetadata(slug: string): Promise<Metadata> {
   const page = await getCmsPage(slug);
+  return cmsPageMetadata(page);
+}
+export function cmsPageMetadata(page: CmsPage | null): Metadata {
   if (!page) return { title: "Página no disponible", robots: { index: false, follow: false } };
   const hero = page.sections.find((block) => block.section_type === "hero");
   const title = page.seo_title || page.title;
   const description = page.seo_description || hero?.data.description || siteConfig.description;
   const metadata = createPageMetadata({ title, description, path: page.path });
   return { ...metadata, openGraph: { ...metadata.openGraph, ...(page.og_image_url ? { images: [page.og_image_url] } : {}) } };
+}
+
+function mapPreviewLinks(value: unknown, links: Record<string, string>): unknown {
+  if (Array.isArray(value)) return value.map(item => mapPreviewLinks(item, links));
+  if (value && typeof value === "object") return Object.fromEntries(Object.entries(value).map(([key, item]) => [key, key === "href" && typeof item === "string" ? links[item] ?? item : mapPreviewLinks(item, links)]));
+  return value;
 }

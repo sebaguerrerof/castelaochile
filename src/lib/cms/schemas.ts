@@ -1,17 +1,20 @@
 import { z } from "zod";
+import { isCmsPath, legacyNavigationGroups } from "./routing.ts";
 
 const text = z.string().trim().max(5000);
 const title = z.string().trim().min(1).max(200);
 export const statusSchema = z.enum(["draft", "published", "archived"]);
+export const cmsPathSchema = z.string().refine(isCmsPath, "Usa una ruta pública válida; las rutas de los módulos privados están reservadas.");
+export const pageCreateSchema = z.object({ title, path: cmsPathSchema }).strict();
 export const safeHref = z.string().trim().max(1000).refine((value) => /^\/(?!\/)[a-zA-Z0-9/_?#=&%.:-]*$/.test(value) || /^https:\/\/[^\s<>"\\]+$/.test(value), "Usa una ruta interna o URL https segura.");
 export const mediaSrcSchema = z.string().refine((value) => /^\/images\/[a-zA-Z0-9._/-]+$/.test(value) || /^\/api\/public\/media\/content\/[a-zA-Z0-9_-]+\/[a-zA-Z0-9._-]+$/.test(value), "Selecciona una imagen de la biblioteca o carga una fotografía.");
 const image = z.object({ src: mediaSrcSchema, alt: z.string().trim().min(1).max(200) }).strict();
 const cta = z.object({ label: title, target: z.enum(["evaluation", "whatsapp", "custom"]), href: safeHref.optional() }).strict().refine((value) => value.target !== "custom" || !!value.href, "El CTA personalizado necesita un destino.");
-const base = { title, description: text.default("") };
-const item = z.object({ title, description: text.default(""), href: z.union([safeHref, z.literal("")]).optional() }).strict();
+const base = { title, subtitle: z.string().trim().max(500).default(""), showTitle: z.boolean().default(true), description: text.default("") };
+const item = z.object({ title, subtitle: z.string().trim().max(500).optional(), description: text.default(""), href: z.union([safeHref, z.literal("")]).optional(), linkLabel: z.string().max(200).optional() }).strict();
 const cards = z.object({ ...base, items: z.array(item).min(1).max(30) }).strict();
 export const blockSchemas = {
-  hero: z.object({ ...base, eyebrow: text.default(""), image: image.optional(), primaryCta: cta.optional(), secondaryCta: cta.optional(), variant: z.enum(["blue", "mist", "warm"]).default("blue") }).strict(),
+  hero: z.object({ ...base, showTitle: z.literal(true).default(true), eyebrow: text.default(""), image: image.optional(), primaryCta: cta.optional(), secondaryCta: cta.optional(), variant: z.enum(["blue", "mist", "warm"]).default("blue") }).strict(),
   rich_text: z.object({ ...base, html: z.string().max(50000) }).strict(),
   text_image: z.object({ ...base, html: z.string().max(50000), image }).strict(),
   feature_cards: cards,
@@ -48,6 +51,8 @@ export const blockSchema = z.discriminatedUnion("section_type", [
 ]);
 export const pageEditSchema = z.object({
   id: z.uuid(), updated_at: z.iso.datetime({ offset: true }), title, nav_label: title,
+  path: cmsPathSchema.optional(), navigation_group: z.string().regex(/^[a-z][a-z0-9-]*$/).max(60).optional(),
+  draft_updated_at: z.iso.datetime({ offset: true }).nullable().optional(),
   status: statusSchema, seo_title: z.string().trim().max(70), seo_description: z.string().trim().max(170),
   og_image_url: z.union([mediaSrcSchema, z.literal("")]), show_in_navigation: z.boolean(), navigation_order: z.number().int().min(0).max(100),
   sections: z.array(blockSchema).min(1).max(40),
@@ -74,7 +79,18 @@ export const settingsSchema = z.object({
   streetAddress: z.string().max(500), city: z.string().max(100), region: z.string().max(100), country: z.string().max(100),
   mapsUrl: optionalUrl, instagram: optionalUrl, facebook: optionalUrl, linkedin: optionalUrl,
   evaluationUrl: safeHref, evaluationLabel: title, footerNotice: text.min(1),
-}).strict();
+  footerDescription: text.default(""), footerTagline: z.string().max(300).default(""),
+  privacyLabel: z.string().max(100).default("Política de privacidad"), privacyUrl: optionalUrl.default(""),
+  navigationGroups: z.array(z.object({ id: z.string().regex(/^[a-z][a-z0-9-]*$/).max(60), label: title }).strict()).min(1).max(12).default(legacyNavigationGroups),
+  navigationLinks: z.array(z.object({ label: title, href: safeHref, groupId: z.string().regex(/^[a-z][a-z0-9-]*$/).max(60), enabled: z.boolean() }).strict()).max(30).default([{ label: "Blog", href: "/blog", groupId: "recursos", enabled: true }]),
+}).strict().superRefine((settings, context) => {
+  const groups = new Set(settings.navigationGroups.map(group => group.id));
+  if (groups.size !== settings.navigationGroups.length) context.addIssue({ code: "custom", path: ["navigationGroups"], message: "Los identificadores de grupo deben ser únicos." });
+  for (const [index, link] of settings.navigationLinks.entries()) {
+    if (!groups.has(link.groupId)) context.addIssue({ code: "custom", path: ["navigationLinks", index], message: "Selecciona un grupo existente." });
+    if (/^\/(?:admin|api|auth|pacientes)(?:\/|$)/i.test(link.href)) context.addIssue({ code: "custom", path: ["navigationLinks", index], message: "No incluyas rutas privadas en la navegación pública." });
+  }
+});
 export type SiteSettings = z.infer<typeof settingsSchema>;
 
 export function parsePublicSections(rows: unknown[]): CmsBlock[] {

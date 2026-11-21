@@ -29,7 +29,8 @@ test("page publication requires one active first hero and no duplicate section I
   const valid = page(); assert.ok(pageEditSchema.safeParse(valid).success);
   assert.equal(pageEditSchema.safeParse({ ...valid, sections: [{ ...hero(), is_enabled: false }] }).success, false);
   assert.equal(pageEditSchema.safeParse({ ...valid, sections: [...valid.sections, ...valid.sections] }).success, false);
-  assert.equal(pageEditSchema.safeParse({ ...valid, path: "/hijack" }).success, false);
+  assert.equal(pageEditSchema.safeParse({ ...valid, path: "/tratamientos/individual" }).success, true);
+  assert.equal(pageEditSchema.safeParse({ ...valid, path: "/pacientes/hijack" }).success, false);
 });
 test("professionals share one schema with optional credentials and mandatory image alt", () => {
   const blank = { full_name: "Persona de prueba", slug: "persona-prueba", role: "Rol editorial", credentials: [], short_bio: "", bio: "", professional_experience: "", recovery_experience: "", featured_quote: "", media: "", conferences: "", profile_image_url: "", profile_image_alt: "", email: "", phone: "", linkedin_url: "", instagram_url: "", cta_label: "", cta_url: "", is_featured: false, status: "draft", sort_order: 0, seo_title: "", seo_description: "" };

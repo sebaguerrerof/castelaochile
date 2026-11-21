@@ -8,9 +8,9 @@ import { useRef, useState } from "react";
 
 import { uploadContentImage } from "@/lib/content-image-upload";
 
-type RichTextEditorProps = { initialHtml: string; name: string; readOnly?: boolean; userId: string; onChange?: (html: string) => void };
+type RichTextEditorProps = { initialHtml: string; name: string; readOnly?: boolean; userId: string; onChange?: (html: string) => void; privateMode?: boolean };
 
-export function RichTextEditor({ initialHtml, name, readOnly = false, userId, onChange }: RichTextEditorProps) {
+export function RichTextEditor({ initialHtml, name, readOnly = false, userId, onChange, privateMode = false }: RichTextEditorProps) {
   const [html, setHtml] = useState(initialHtml);
   const [message, setMessage] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
@@ -21,7 +21,7 @@ export function RichTextEditor({ initialHtml, name, readOnly = false, userId, on
     content: initialHtml,
     extensions: [
       StarterKit.configure({ heading: { levels: [2, 3] }, link: { openOnClick: false, autolink: true, defaultProtocol: "https" } }),
-      Image.configure({ allowBase64: false, inline: false }),
+      ...(privateMode ? [] : [Image.configure({ allowBase64: false, inline: false })]),
     ],
     onUpdate: ({ editor: current }) => { setHtml(current.getHTML()); onChange?.(current.getHTML()); },
   });
@@ -38,7 +38,7 @@ export function RichTextEditor({ initialHtml, name, readOnly = false, userId, on
   async function uploadImage(event: React.ChangeEvent<HTMLInputElement>) {
     const input = event.currentTarget;
     const file = input.files?.[0];
-    if (!file || !editor) return;
+    if (!file || !editor || privateMode) return;
     if (!new Set(["image/jpeg", "image/png", "image/webp"]).has(file.type) || file.size > 5 * 1024 * 1024) {
       setMessage("Usa JPG, PNG o WebP de hasta 5 MB.");
       return;
@@ -68,10 +68,10 @@ export function RichTextEditor({ initialHtml, name, readOnly = false, userId, on
       {button("Lista con viñetas", editor?.isActive("bulletList") ?? false, () => editor?.chain().focus().toggleBulletList().run(), <List aria-hidden="true" size={17} />)}
       {button("Lista numerada", editor?.isActive("orderedList") ?? false, () => editor?.chain().focus().toggleOrderedList().run(), <ListOrdered aria-hidden="true" size={17} />)}
       {button("Cita", editor?.isActive("blockquote") ?? false, () => editor?.chain().focus().toggleBlockquote().run(), <Quote aria-hidden="true" size={17} />)}
-      {button("Enlace", editor?.isActive("link") ?? false, setLink, <Link2 aria-hidden="true" size={17} />)}
+      {!privateMode && button("Enlace", editor?.isActive("link") ?? false, setLink, <Link2 aria-hidden="true" size={17} />)}
       {button("Separador", false, () => editor?.chain().focus().setHorizontalRule().run(), <Minus aria-hidden="true" size={17} />)}
-      <button aria-label="Insertar imagen" disabled={uploading} onClick={() => fileInput.current?.click()} type="button"><ImagePlus aria-hidden="true" size={17} /></button>
-      <input accept="image/jpeg,image/png,image/webp" className="sr-only" onChange={uploadImage} ref={fileInput} type="file" />
+      {!privateMode && <><button aria-label="Insertar imagen" disabled={uploading} onClick={() => fileInput.current?.click()} type="button"><ImagePlus aria-hidden="true" size={17} /></button>
+      <input accept="image/jpeg,image/png,image/webp" className="sr-only" onChange={uploadImage} ref={fileInput} type="file" /></>}
     </div>
     <EditorContent editor={editor} />
     {message && <p className="admin-form-help" role="status">{message}</p>}

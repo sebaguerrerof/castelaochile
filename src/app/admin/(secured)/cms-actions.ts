@@ -3,7 +3,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { requireAdmin } from "@/lib/auth/admin";
-import { pageEditSchema, professionalSchema, settingsSchema } from "@/lib/cms/schemas";
+import { pageCreateSchema, pageEditSchema, professionalSchema, settingsSchema } from "@/lib/cms/schemas";
 import { sanitizeBlogHtml } from "@/lib/blog/content";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import type { AdminActionState } from "@/lib/admin-action-state";
@@ -19,6 +19,19 @@ function payload(form: FormData): unknown {
   if (typeof raw !== "string" || raw.length > 900000) return null;
   try { return JSON.parse(raw); } catch { return null; }
 }
+function editorialError(code?: string): AdminActionState {
+  return { status: "error", message: code === "40001" ? "Otra persona modificó el contenido o su borrador. Recarga antes de guardar." : code === "23505" ? "La ruta o el identificador ya está en uso." : "No se guardaron los cambios. Revisa los campos y tu sesión." };
+}
+export async function createEditorialPage(_state: AdminActionState, form: FormData): Promise<AdminActionState> {
+  await requireAdmin(["editor", "superadmin"]);
+  const parsed = pageCreateSchema.safeParse({ title: form.get("title"), path: form.get("path") });
+  if (!parsed.success) return failure(parsed.error);
+  const client = await createServerSupabaseClient();
+  const { data, error } = await client.rpc("create_editorial_page", { p_title: parsed.data.title, p_path: parsed.data.path });
+  if (error) return editorialError(error.code);
+  revalidatePath("/admin/paginas");
+  redirect(`/admin/paginas/${data}?success=created`);
+}
 export async function saveCmsPage(_state: AdminActionState, form: FormData): Promise<AdminActionState> {
   await requireAdmin(["editor", "superadmin"]);
   const input = payload(form);
@@ -31,10 +44,22 @@ export async function saveCmsPage(_state: AdminActionState, form: FormData): Pro
     return { ...block, sort_order: index };
   });
   const client = await createServerSupabaseClient();
-  const { error } = await client.rpc("save_cms_page", { p_page: page as unknown as Json });
-  if (error) return { status: "error", message: error.code === "40001" ? "Otra persona modificó esta página. Recarga antes de guardar para no sobrescribir sus cambios." : "No se guardaron los cambios. Revisa tu sesión y la migración CMS." };
+  const { error } = await client.rpc("save_editorial_content", { p_kind: "page", p_id: page.id, p_data: page as unknown as Json, p_base_updated_at: page.updated_at, p_draft_updated_at: page.draft_updated_at ?? null, p_publish: page.status !== "draft" });
+  if (error) return editorialError(error.code);
   revalidatePath("/", "layout"); revalidatePath("/sitemap.xml");
   redirect(`/admin/paginas/${page.id}?success=saved`);
+}
+export async function withdrawCmsPage(_state: AdminActionState, form: FormData): Promise<AdminActionState> {
+  await requireAdmin(["editor", "superadmin"]);
+  const id = z.uuid().safeParse(form.get("id"));
+  const base = z.iso.datetime({ offset: true }).safeParse(form.get("updated_at"));
+  const draft = form.get("draft_updated_at");
+  if (!id.success || !base.success || (draft && !z.iso.datetime({ offset: true }).safeParse(draft).success)) return { status: "error", message: "Identificador o versión inválidos. Recarga el formulario." };
+  const client = await createServerSupabaseClient();
+  const { error } = await client.rpc("withdraw_editorial_page", { p_id: id.data, p_base_updated_at: base.data, p_draft_updated_at: typeof draft === "string" && draft ? draft : null });
+  if (error) return editorialError(error.code);
+  revalidatePath("/", "layout"); revalidatePath("/sitemap.xml");
+  redirect(`/admin/paginas/${id.data}?success=withdrawn`);
 }
 export async function saveProfessional(_state: AdminActionState, form: FormData): Promise<AdminActionState> {
   await requireAdmin(["editor", "superadmin"]);
@@ -45,18 +70,30 @@ export async function saveProfessional(_state: AdminActionState, form: FormData)
   if (!parsed.success) return failure(parsed.error);
   const person = { ...parsed.data, bio: sanitizeBlogHtml(parsed.data.bio), professional_experience: sanitizeBlogHtml(parsed.data.professional_experience), recovery_experience: sanitizeBlogHtml(parsed.data.recovery_experience) };
   const client = await createServerSupabaseClient();
-  const result = id ? await client.from("professionals").update(person).eq("id", id).eq("updated_at", updatedAt).select("id").maybeSingle() : await client.from("professionals").insert(person).select("id").single();
-  if (result.error || !result.data) return { status: "error", message: result.error?.code === "23505" ? "El slug ya está en uso. Elige otro." : "No se guardó el perfil. Puede haber cambiado desde que lo abriste; recarga y verifica tu sesión." };
+  let resourceId = id;
+  let baseVersion = updatedAt;
+  if (!resourceId) {
+    const created = await client.from("professionals").insert({ ...person, status: "draft" }).select("id,updated_at").single();
+    if (created.error) return editorialError(created.error.code);
+    resourceId = created.data.id; baseVersion = created.data.updated_at;
+  }
+  const draftVersion = form.get("draft_updated_at");
+  if (draftVersion && !z.iso.datetime({ offset: true }).safeParse(draftVersion).success) return { status: "error", message: "Versión de borrador inválida." };
+  const result = await client.rpc("save_editorial_content", { p_kind: "professional", p_id: resourceId, p_data: person as unknown as Json, p_base_updated_at: baseVersion, p_draft_updated_at: typeof draftVersion === "string" && draftVersion ? draftVersion : null, p_publish: person.status !== "draft" });
+  if (result.error) return editorialError(result.error.code);
   revalidatePath("/", "layout"); revalidatePath("/sitemap.xml");
-  redirect(`/admin/equipo/${result.data.id}?success=saved`);
+  redirect(`/admin/equipo/${resourceId}?success=saved`);
 }
 export async function saveSiteSettings(_state: AdminActionState, form: FormData): Promise<AdminActionState> {
   await requireAdmin(["editor", "superadmin"]);
   const parsed = settingsSchema.safeParse(payload(form));
   if (!parsed.success) return failure(parsed.error);
   const client = await createServerSupabaseClient();
-  const { data, error } = await client.from("site_settings").update({ data: parsed.data }).eq("id", "global").select("id").maybeSingle();
-  if (error || !data) return { status: "error", message: "No fue posible guardar la configuración." };
+  const base = z.iso.datetime({ offset: true }).safeParse(form.get("updated_at"));
+  const draft = form.get("draft_updated_at");
+  if (!base.success || (draft && !z.iso.datetime({ offset: true }).safeParse(draft).success)) return { status: "error", message: "Recarga para obtener la versión actual de configuración." };
+  const { error } = await client.rpc("save_editorial_content", { p_kind: "settings", p_id: "global", p_data: parsed.data as unknown as Json, p_base_updated_at: base.data, p_draft_updated_at: typeof draft === "string" && draft ? draft : null, p_publish: form.get("intent") === "published" });
+  if (error) return editorialError(error.code);
   revalidatePath("/", "layout");
   redirect("/admin/configuracion?success=saved");
 }

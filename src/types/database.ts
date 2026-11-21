@@ -67,6 +67,9 @@ export type Database = {
     Views: Record<never, never>;
     Functions: {
       save_cms_page: { Args: { p_page: Json }; Returns: string };
+      create_editorial_page: { Args: { p_title: string; p_path: string }; Returns: string };
+      withdraw_editorial_page: { Args: { p_id: string; p_base_updated_at: string; p_draft_updated_at: string | null }; Returns: string };
+      save_editorial_content: { Args: { p_kind: string; p_id: string; p_data: Json; p_base_updated_at: string; p_draft_updated_at: string | null; p_publish: boolean }; Returns: string };
       record_page_view: { Args: { p_path: string; p_event_date: string }; Returns: undefined };
       record_consented_page_view: { Args: { p_event_id: string; p_path: string; p_visitor_hash: string }; Returns: undefined };
       get_web_analytics: { Args: { p_days: number }; Returns: Json };
