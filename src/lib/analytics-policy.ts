@@ -8,7 +8,7 @@ export const visitorIdSchema = z.uuid();
 export const analyticsEventSchema = z.object({
   event: z.literal("page_view"),
   eventId: z.uuid(),
-  path: z.string().regex(/^\/(?!admin(?:\/|$)|api(?:\/|$))[A-Za-z0-9/_-]*$/).max(180),
+  path: z.string().regex(/^\/(?!admin(?:\/|$)|api(?:\/|$)|pacientes(?:\/|$)|auth(?:\/|$))[A-Za-z0-9/_-]*$/i).max(180),
 }).strict();
 
 export function readAnalyticsConsent(cookieHeader: string): "accepted" | "rejected" | null {

@@ -6,7 +6,7 @@ export default function AdminForbidden() {
       <p className="eyebrow">403</p>
       <h1>Tu cuenta no tiene permisos para esta sección.</h1>
       <p>Solicita a una persona superadministradora que revise o active tu rol.</p>
-      <Link href="/admin/login">Volver al acceso</Link>
+      <Link prefetch={false} href="/admin/login">Volver al acceso</Link>
     </main>
   );
 }

@@ -1,0 +1,27 @@
+-- Synthetic upload completion, real database privileges; all records roll back.
+begin;
+create function pg_temp.luid(n int)returns uuid language sql as $$select ('eb000000-0000-4000-8000-'||lpad(n::text,12,'0'))::uuid$$;
+create function pg_temp.library_assert(v boolean,label text)returns text language plpgsql as $$begin if v is distinct from true then raise exception 'FAIL: %',label;end if;return label;end$$;
+create function pg_temp.library_denied(q text,label text)returns text language plpgsql as $$begin begin execute q;exception when insufficient_privilege then return label;when raise_exception then if sqlerrm in ('Acceso denegado','Objeto no disponible')then return label;else raise;end if;end;raise exception 'FAIL: % permitted',label;end$$;
+insert into auth.users(id,email)select pg_temp.luid(n),'upload-roles-'||n||'@example.test'from generate_series(1,5)n;
+insert into public.admin_users(user_id,role,is_active)values(pg_temp.luid(1),'superadmin',true),(pg_temp.luid(2),'superadmin',false),(pg_temp.luid(3),'editor',true),(pg_temp.luid(4),'viewer',true),(pg_temp.luid(5),'viewer',false);
+insert into public.therapeutic_staff_permissions(user_id,manage_content)values(pg_temp.luid(4),true),(pg_temp.luid(5),true);
+insert into public.patient_library_materials(id,area_id,title,kind,audience,author_id)values(pg_temp.luid(100),(select id from public.therapy_areas where is_active order by sort_order limit 1),'Upload role synthetic QA','guide','all',pg_temp.luid(1));
+insert into public.patient_library_attachments(id,material_id,original_name,mime,bytes)select pg_temp.luid(n),pg_temp.luid(100),'neutral.pdf','application/pdf',8 from generate_series(200,205)n;
+select public.library_finish_attachment(pg_temp.luid(200),false,pg_temp.luid(1));
+select pg_temp.library_assert((select state='failed'from public.patient_library_attachments where id=pg_temp.luid(200)),'Active Direction completes without manual permissions');
+select pg_temp.library_denied($$select public.library_finish_attachment(pg_temp.luid(201),false,pg_temp.luid(2))$$,'Inactive Direction denied');
+select pg_temp.library_denied($$select public.library_finish_attachment(pg_temp.luid(202),false,pg_temp.luid(3))$$,'Editor without library grant denied');
+select public.library_finish_attachment(pg_temp.luid(203),false,pg_temp.luid(4));
+select pg_temp.library_assert((select state='failed'from public.patient_library_attachments where id=pg_temp.luid(203)),'Existing explicit content authorization preserved');
+select pg_temp.library_denied($$select public.library_finish_attachment(pg_temp.luid(204),false,pg_temp.luid(5))$$,'Inactive explicit staff denied');
+select pg_temp.library_denied($$select public.library_finish_attachment(pg_temp.luid(205),true,pg_temp.luid(1))$$,'Direction cannot mark a missing object ready');
+select pg_temp.library_assert((select count(*)=4 from public.patient_library_attachments where material_id=pg_temp.luid(100)and state='pending'),'Denied completions do not mutate attachments');
+set local role authenticated;
+select pg_temp.library_denied($$select public.library_finish_attachment(pg_temp.luid(201),true,pg_temp.luid(1))$$,'Authenticated cannot impersonate server completion');
+reset role;
+set local role anon;
+select pg_temp.library_denied($$select public.library_finish_attachment(pg_temp.luid(201),true,pg_temp.luid(1))$$,'Anonymous cannot complete uploads');
+reset role;
+select pg_temp.library_assert(has_function_privilege('service_role','public.library_finish_attachment(uuid,boolean,uuid)','EXECUTE')and not has_function_privilege('authenticated','public.library_finish_attachment(uuid,boolean,uuid)','EXECUTE'),'Completion remains server only');
+rollback;

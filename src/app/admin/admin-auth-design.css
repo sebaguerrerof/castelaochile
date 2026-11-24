@@ -1,0 +1,17 @@
+.admin-login-page {
+  background: radial-gradient(ellipse at 15% 10%, #deeff9 0, transparent 48%), #f5f7fb;
+  font-family: "Segoe UI", Arial, sans-serif;
+}
+.admin-login-page section {
+  border: 1px solid #e1e8ef;
+  border-radius: 1.4rem;
+  box-shadow: 0 24px 70px #1732470d;
+}
+.admin-login-page h1 { font-family: inherit; font-weight: 700; letter-spacing: -.04em; color: #173247; }
+.admin-login-page p { font-size: .9rem; }
+.admin-login-form label { font-weight: 600; font-size: .85rem; }
+.admin-login-form input { min-height: 48px; border-color: #cddae5; border-radius: .75rem; padding: .85rem; font-size: 16px; }
+.admin-login-form button { min-height: 48px; border-radius: .75rem; font-weight: 600; box-shadow: 0 4px 12px #0079be1c; transition: background-color 160ms, box-shadow 160ms; }
+.admin-login-form button:hover { background: #00679f; box-shadow: 0 6px 18px #0079be26; }
+.admin-login-form :focus-visible { outline: 3px solid #0079be; outline-offset: 3px; }
+@media (prefers-reduced-motion: reduce) { .admin-login-form * { transition: none; } }

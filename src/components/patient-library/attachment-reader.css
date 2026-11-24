@@ -1,0 +1,20 @@
+.library-file:has(> .library-reader-control) { display: grid; grid-template-columns: auto minmax(0, 1fr); }
+.library-reader-control { grid-column: 1 / -1; min-width: 0; width: 100%; }
+.library-read-button { display: inline-flex; align-items: center; justify-content: center; gap: .5rem; min-height: 44px; border: 1px solid #b9d9ed; border-radius: .75rem; padding: .6rem .9rem; background: #edf7fd; color: #00649d; font: inherit; font-weight: 600; cursor: pointer; }
+.library-reader { margin-top: 1rem; border: 1px solid #d7e3ea; border-radius: 1rem; background: #fff; overflow: hidden; padding: 1rem; min-width: 0; }
+.library-reader-toolbar { display: flex; justify-content: space-between; align-items: center; gap: .75rem; border-bottom: 1px solid #e1ebf2; padding-bottom: .85rem; margin-bottom: 1rem; }
+.library-reader-toolbar strong { font-size: .9rem; overflow-wrap: anywhere; }
+.library-reader button { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; min-width: 44px; gap: .3rem; padding: .5rem; border: 1px solid #d7e3ea; border-radius: .65rem; background: #f8fbfd; color: #18394f; font: inherit; font-size: .8rem; cursor: pointer; }
+.library-reader button:disabled { opacity: .5; cursor: default; }
+.library-reader :focus-visible, .library-read-button:focus-visible { outline: 3px solid #0079be; outline-offset: 3px; }
+.library-reader-pages { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .5rem; margin: 1rem 0; font-size: .8rem; }
+.library-reader canvas { display: block; margin: auto; height: auto; border: 1px solid #e1e8ef; }
+.library-reader img { display: block; max-width: 100%; max-height: 75dvh; object-fit: contain; margin: auto; }
+.library-reader-text { margin-top: 1rem; font-size: .85rem; }
+.library-reader-text summary { min-height: 44px; cursor: pointer; }
+.library-reader-text p { white-space: pre-wrap; overflow-wrap: anywhere; }
+.library-reader-document { overflow-x: auto; max-width: 100%; padding: .25rem; font-size: 1rem; line-height: 1.8; }
+.library-reader-document p { overflow-wrap: anywhere; }
+.library-reader-document table { border-collapse: collapse; font-size: .85rem; }
+.library-reader-document td { border: 1px solid #d7e3ea; padding: .5rem; min-width: 4rem; }
+@media (max-width: 540px) { .library-reader { padding: .75rem; } .library-read-button { width: 100%; } .library-reader-pages { font-size: .72rem; } }

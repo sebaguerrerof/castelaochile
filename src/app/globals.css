@@ -28,6 +28,10 @@
 }
 
 :root {
+  --app-safe-top: env(safe-area-inset-top, 0px);
+  --app-safe-right: env(safe-area-inset-right, 0px);
+  --app-safe-bottom: env(safe-area-inset-bottom, 0px);
+  --app-safe-left: env(safe-area-inset-left, 0px);
   /* Official primitives — Manual pp. 9–11. */
   --brand-blue: #0079be;
   --brand-orange: #da8a1b;

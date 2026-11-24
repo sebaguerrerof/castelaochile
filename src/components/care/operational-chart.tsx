@@ -1,0 +1,8 @@
+import Link from "next/link";
+import { operationalRatio } from "@/lib/care/dashboard";
+export function OperationalChart({title,total,n,summary,rows,distribution=false,unit="registros",unitSingular}:{title:string;total:number;n:number;summary:string;rows:{key:string;label:string;value:number;href:string}[];distribution?:boolean;unit?:string;unitSingular?:string}){
+ const countUnit=total===1&&unitSingular?unitSingular:unit;
+ return <figure className="care-chart" aria-label={title}><figcaption><h3>{title}</h3><p className="care-chart-result">{distribution?`${total} ${countUnit}`:operationalRatio(n,total)}</p><p>{summary}</p></figcaption>
+ {total>0?<><p className="care-subtle">Eje común: 0 a {total} {countUnit}. Barras por cantidad, con base cero.</p><ul className="care-chart-bars">{rows.map(row=><li key={row.key}><Link href={row.href} prefetch={false}>{row.label} · {row.value}/{total}</Link><span className="care-chart-track" aria-hidden="true"><span className={`care-chart-fill care-chart-${row.key}`} style={{width:`${row.value/total*100}%`}}/></span></li>)}</ul></>:<p>Sin observaciones elegibles en este periodo. No se calcula un porcentaje.</p>}
+ <details><summary>Tabla de datos y fuentes de {title.toLowerCase()}</summary><table className="care-data-table"><caption>Categorías de {title.toLowerCase()}</caption><thead><tr><th scope="col">Estado</th><th scope="col">Cantidad / total</th><th scope="col">Evidencia</th></tr></thead><tbody>{rows.map(r=><tr key={r.key}><th scope="row">{r.label}</th><td>{r.value}/{total}</td><td><Link href={r.href} prefetch={false}>Abrir registros de {r.label.toLowerCase()}</Link></td></tr>)}</tbody></table></details></figure>;
+}

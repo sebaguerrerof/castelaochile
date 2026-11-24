@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { createBrowserSupabaseClient } from "@/lib/supabase/browser";
+import { adminReturnPath } from "@/lib/auth/admin-return-path";
 
 export function AdminLoginForm() {
   const router = useRouter();
@@ -37,7 +38,7 @@ export function AdminLoginForm() {
         setError("No fue posible iniciar sesión. Revisa tus credenciales o contacta a la persona administradora.");
         return;
       }
-      router.replace("/admin");
+      router.replace(adminReturnPath(new URLSearchParams(window.location.search).get("next")));
       router.refresh();
     } catch {
       setError("El acceso administrativo aún no está configurado.");

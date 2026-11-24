@@ -2,7 +2,11 @@
 
 Web institucional multipágina para Instituto Castelao Chile, con CMS, Equipo, perfiles profesionales y Blog/Noticias administrados en Supabase. Está construido con Next.js App Router, React, TypeScript estricto, Tailwind CSS v4, Radix Accordion y Lucide. Público y vistas previas del administrador comparten componentes y sistema visual.
 
+Biblioteca terapéutica privada implementada en `/pacientes` e integrada en el administrador. Activada en producción el 9 de octubre de 2026, con autorización del usuario, en `https://www.castelaochile.cl`; `.env.example` conserva flags cerrados para nuevos entornos. Arquitectura/activación: [docs/CASTELAO_PORTAL_PACIENTES.md](docs/CASTELAO_PORTAL_PACIENTES.md); pruebas y límites de validación: [docs/CASTELAO_PORTAL_PACIENTES_STATUS.md](docs/CASTELAO_PORTAL_PACIENTES_STATUS.md).
+
 ## Requisitos
+
+Dominio de pruebas `castelaochile.cl`, transición futura a `castelao.cl` y configuración de DNS/SMTP/buzones: [docs/CASTELAO_DOMINIO_CORREOS.md](docs/CASTELAO_DOMINIO_CORREOS.md). Web y portal publicados; primer envío externo a cargo del usuario.
 
 - Node.js 22.12 o posterior.
 - pnpm compatible con el lockfile; versión verificada: 10.12.1.

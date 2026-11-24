@@ -12,13 +12,41 @@ import { BrandLogo } from "@/components/shared/brand-logo";
 import { WhatsAppIcon } from "@/components/shared/whatsapp-icon";
 import { Container } from "./container";
 
-export function Header({ items = navigationItems, evaluationUrl = "/contacto", evaluationLabel = "Agendar evaluación", whatsapp = "" }: { items?: readonly NavigationItem[]; evaluationUrl?: string; evaluationLabel?: string; whatsapp?: string }) {
+export function Header({ items = navigationItems, evaluationUrl = "/contacto", evaluationLabel = "Agendar evaluación", whatsapp = "", navigationGroups }: { items?: readonly NavigationItem[]; evaluationUrl?: string; evaluationLabel?: string; whatsapp?: string; navigationGroups?: readonly { id: string; label: string }[] }) {
   const pathname = usePathname();
-  const groups = groupPublicNavigation(items);
+  const groups = groupPublicNavigation(items, navigationGroups);
   const [dropdown, setDropdown] = useState<string | null>(null);
+  const [compact, setCompact] = useState(true);
   const [mobileOpen, setMobileOpen] = useState(false);
   const dialog = useRef<HTMLDialogElement>(null);
   const header = useRef<HTMLElement>(null);
+  useEffect(() => {
+    const element = header.current;
+    if (!element) return;
+    const main = element.querySelector<HTMLElement>(".public-header__main");
+    const nav = element.querySelector<HTMLElement>(".public-header__navigation");
+    const brand = element.querySelector<HTMLElement>(".public-header__brand");
+    const cta = element.querySelector<HTMLElement>(".public-header__cta");
+    if (!main || !nav || !brand || !cta) return;
+    const measure = () => {
+      if (window.innerWidth < 1180) { setCompact(false); return; }
+      const style = getComputedStyle(main);
+      const available = main.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight);
+      const list = nav.querySelector<HTMLElement>(":scope > ul");
+      if (!list) return;
+      // Absolutely positioned dropdown panels must not inflate the closed menu's width.
+      const entries = Array.from(list.children) as HTMLElement[];
+      const navWidth = entries.reduce((width, item) => width + item.offsetWidth, 0) + Math.max(0, entries.length - 1) * (parseFloat(getComputedStyle(list).columnGap) || 0);
+      const required = brand.offsetWidth + navWidth + cta.offsetWidth + 2 * (parseFloat(style.columnGap) || 24);
+      setCompact(required > available);
+    };
+    const observer = new ResizeObserver(measure);
+    [main, nav, brand, cta].forEach(node => observer.observe(node));
+    document.fonts.ready.then(measure);
+    window.addEventListener("resize", measure);
+    measure();
+    return () => { observer.disconnect(); window.removeEventListener("resize", measure); };
+  }, [items, evaluationLabel]);
   const hoverClose = useRef<ReturnType<typeof setTimeout> | null>(null);
   const whatsappUrl = whatsappHref(whatsapp);
 
@@ -78,7 +106,7 @@ export function Header({ items = navigationItems, evaluationUrl = "/contacto", e
     return () => { document.body.style.overflow = previous; };
   }, [mobileOpen]);
 
-  return <header className="public-header" ref={header}>
+  return <header className={"public-header" + (compact ? " public-header--compact" : "")} ref={header}>
     <div className="public-header__utility"><Container>
       <span>Instituto Castelao <span className="public-header__country">Chile</span></span>
       {whatsappUrl && <a href={whatsappUrl} rel="noopener noreferrer" target="_blank"><WhatsAppIcon /> <span>Conversemos por WhatsApp</span><ArrowRight size={14} /></a>}

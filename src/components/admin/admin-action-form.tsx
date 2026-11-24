@@ -1,8 +1,9 @@
 "use client";
 
-import { useActionState, useEffect, useState } from "react";
+import { useActionState, useEffect, useRef, useState } from "react";
 
 import type { AdminActionState, AdminFormAction } from "@/lib/admin-action-state";
+import { AdminFormDialog } from "./admin-form-dialog";
 
 const initialState: AdminActionState = { status: "idle" };
 
@@ -17,7 +18,12 @@ const fieldLabels: Record<string, string> = {
   publishedAt: "Fecha de publicación",
   seoTitle: "Título SEO",
   seoDescription: "Meta descripción",
-  email: "Correo institucional",
+  email: "Correo electrónico",
+  name: "Nombre",
+  description: "Descripción",
+  area_id: "Área",
+  parent_id: "Carpeta padre",
+  display_name: "Nombre del paciente",
   id: "Identificador",
   kind: "Tipo",
   role: "Rol",
@@ -34,14 +40,22 @@ export function AdminActionForm({
   className,
   confirmMessage,
   warnOnUnsavedChanges = false,
+  dialog,
 }: {
   action: AdminFormAction;
   children: React.ReactNode;
   className: string;
   confirmMessage?: string;
   warnOnUnsavedChanges?: boolean;
+  dialog?: { title: string; triggerLabel: string };
 }) {
-  const [state, formAction] = useActionState(action, initialState);
+  const allowReset = useRef(false);
+  const [state, formAction, pending] = useActionState(async (previous: AdminActionState, data: FormData) => {
+    allowReset.current = false;
+    const result = await action(previous, data);
+    allowReset.current = result.status !== "error";
+    return result;
+  }, initialState);
   const [dirty, setDirty] = useState(false);
   useEffect(() => {
     if (!warnOnUnsavedChanges || !dirty) return;
@@ -53,9 +67,11 @@ export function AdminActionForm({
     messages.map((message) => ({ field: fieldLabels[field] ?? field, message })),
   );
 
-  return (
+  const form = (
     <form
       action={formAction}
+      aria-busy={pending}
+      onReset={event => { if (!allowReset.current) event.preventDefault(); }}
       className={className}
       onChange={() => { if (warnOnUnsavedChanges) setDirty(true); }}
       onSubmit={(event) => {
@@ -76,4 +92,5 @@ export function AdminActionForm({
       )}
     </form>
   );
+  return dialog ? <AdminFormDialog {...dialog}>{form}</AdminFormDialog> : form;
 }

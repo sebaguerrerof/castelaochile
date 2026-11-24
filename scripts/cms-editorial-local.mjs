@@ -1,0 +1,22 @@
+import {spawn} from 'node:child_process';
+import {readFile,writeFile,mkdir} from 'node:fs/promises';
+import {existsSync} from 'node:fs';
+import path from 'node:path';
+import assert from 'node:assert/strict';
+const marker=JSON.parse(await readFile('tmp/patient-supabase-local/patient-qa.json','utf8'));
+assert.equal(marker.project,'castelao-patient-qa');
+assert.equal(marker.api,'http://127.0.0.1:54421');
+const action=process.argv[2];
+const file=action==='migrate'?'supabase/migrations/20261106140729_cms_editorial_workspace.sql':action==='test'?'supabase/tests/cms_editorial_test.sql':null;
+if(!file)throw new Error('Usa migrate o test. Solo se admite el PostgreSQL local de QA.');
+const binary=process.platform==='win32'?path.join(process.env.LOCALAPPDATA,'Programs','DockerDesktop','resources','bin','docker.exe'):'docker';
+if(process.platform==='win32')assert(existsSync(binary));
+const sql=await readFile(file,'utf8');
+const output=await new Promise((resolve,reject)=>{
+ const child=spawn(binary,['exec','-i','supabase_db_castelao-patient-qa','psql','-X','-U','postgres','-d','postgres','-v','ON_ERROR_STOP=1','-P','pager=off'],{windowsHide:true,stdio:['pipe','pipe','pipe']});
+ let out='',error='';child.stdout.on('data',data=>out+=data);child.stderr.on('data',data=>error+=data);
+ child.on('error',reject);child.on('close',code=>code===0?resolve(out):reject(new Error(error)));child.stdin.end(sql);
+});
+await mkdir('tmp/client-content-2026-11-06',{recursive:true});
+await writeFile(`tmp/client-content-2026-11-06/db-${action}.txt`,output);
+console.log(`CMS local ${action}: PASS. PostgreSQL real, sin conexión remota.`);

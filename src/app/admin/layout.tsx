@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
 import "./(secured)/admin.css";
+import "./admin-auth-design.css";
 
 export const metadata: Metadata = { robots: { index: false, follow: false, nocache: true } };
 

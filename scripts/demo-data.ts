@@ -1,0 +1,11 @@
+import assert from "node:assert/strict";
+import { createClient } from "@supabase/supabase-js";
+import { seedDemo } from "../src/lib/demo/service.ts";
+import type { Database } from "../src/types/database.ts";
+const url=process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const expected=process.argv.includes("--production")?"https://rybcqiuklmoxhcostmlf.supabase.co":"http://127.0.0.1:54421";
+assert.equal(url,expected,"Proyecto fuera del alcance autorizado");
+const actor=process.env.DEMO_ACTOR_ID;assert.ok(actor,"Se requiere una cuenta de Dirección existente como propietaria del conjunto");assert.match(actor,/^[0-9a-f-]{36}$/);
+const service=createClient<Database>(url,process.env.SUPABASE_SECRET_KEY!,{auth:{persistSession:false}});
+const result=await seedDemo(service,actor);
+console.log(JSON.stringify({status:"ACTIVE",environment:expected,id:result.id,summary:result.summary}));

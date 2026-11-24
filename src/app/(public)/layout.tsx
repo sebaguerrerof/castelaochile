@@ -19,9 +19,9 @@ export default async function PublicLayout({ children }: Readonly<{ children: Re
   return <div className="public-site">
     <a className="skip-link" href="#main-content">Saltar al contenido</a>
     <JsonLd data={{ "@context": "https://schema.org", "@type": "Organization", name: siteConfig.name, url: siteConfig.url, ...(settings.email ? { email: settings.email } : {}), ...(settings.phone ? { telephone: settings.phone } : {}), sameAs: [settings.instagram, settings.facebook, settings.linkedin].filter(Boolean), ...(settings.streetAddress ? { address: { "@type": "PostalAddress", streetAddress: settings.streetAddress, addressLocality: settings.city, addressRegion: settings.region, addressCountry: settings.country } } : {}) }} />
-    <Header evaluationLabel={settings.evaluationLabel} evaluationUrl={settings.evaluationUrl} items={items} whatsapp={settings.whatsapp} />
+    <Header evaluationLabel={settings.evaluationLabel} evaluationUrl={settings.evaluationUrl} items={items} navigationGroups={settings.navigationGroups} whatsapp={settings.whatsapp} />
     <main id="main-content">{children}</main>
-    <Footer contact={settingsContact(settings)} items={items} notice={settings.footerNotice} />
+    <Footer contact={settingsContact(settings)} items={items} notice={settings.footerNotice} settings={settings} />
     <FloatingWhatsApp whatsapp={settings.whatsapp || null} />
     {analyticsEnabled && <AnalyticsTracker initialConsent={initialConsent} />}
   </div>;

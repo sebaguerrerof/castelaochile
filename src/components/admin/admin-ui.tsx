@@ -3,6 +3,7 @@ import { CircleAlert, Inbox, SearchX, ToggleLeft } from "lucide-react";
 import Link from "next/link";
 
 import { cn } from "@/lib/utils";
+import { AdminFormDialog } from "./admin-form-dialog";
 import type { AdminRole, ContactSubmissionStatus, ContentKind, ContentOrigin, ContentStatus } from "@/types/database";
 
 export function PageHeader({ actions, description, eyebrow, title }: { actions?: React.ReactNode; description: string; eyebrow?: string; title: string }) {
@@ -19,7 +20,7 @@ export function MetricCard({ detail, icon: Icon, label, value }: { detail?: stri
 }
 
 const labels: Record<AdminRole | ContactSubmissionStatus | ContentKind | ContentOrigin | ContentStatus, string> = {
-  archived: "Archivado", blog: "Blog", castelao_cl: "Castelao Chile", castelao_es: "Castelao España", closed: "Cerrada", draft: "Borrador", editor: "Editor", in_progress: "En progreso", new: "Nueva", news: "Noticia", published: "Publicado", spam: "Spam", superadmin: "Superadministrador", viewer: "Solo lectura",
+  archived: "Archivado", blog: "Blog", castelao_cl: "Castelao Chile", castelao_es: "Castelao España", closed: "Cerrada", draft: "Borrador", editor: "Editor del sitio web", in_progress: "En progreso", new: "Nueva", news: "Noticia", published: "Publicado", spam: "Spam", superadmin: "Dirección · Superadministrador", viewer: "Solo lectura del sitio web", psychologist: "Psicólogo", psychiatrist: "Psiquiatra", recovery_coach: "Coach Recovery",
 };
 
 export function StatusBadge({ value }: { value: keyof typeof labels | "active" | "inactive" }) {
@@ -28,7 +29,7 @@ export function StatusBadge({ value }: { value: keyof typeof labels | "active" |
 }
 
 export function FilterTabs({ items, label }: { items: { active: boolean; href: string; label: string; count?: number }[]; label: string }) {
-  return <nav aria-label={label} className="admin-filter-tabs">{items.map((item) => <Link aria-current={item.active ? "page" : undefined} href={item.href} key={item.href}>{item.label}{typeof item.count === "number" && <span>{item.count}</span>}</Link>)}</nav>;
+  return <nav aria-label={label} className="admin-filter-tabs">{items.map((item) => <Link aria-current={item.active ? "page" : undefined} href={item.href} key={item.href} prefetch={false}>{item.label}{typeof item.count === "number" && <span>{item.count}</span>}</Link>)}</nav>;
 }
 
 export function StatePanel({ action, description, icon: Icon = Inbox, title, tone = "empty" }: { action?: React.ReactNode; description: string; icon?: LucideIcon; title: string; tone?: "disabled" | "empty" | "error" | "filter" }) {
@@ -40,9 +41,9 @@ export function AdminNotice({ children, tone = "success" }: { children: React.Re
   return <div className="admin-notice" data-tone={tone} role={tone === "error" ? "alert" : "status"}>{children}</div>;
 }
 
-export function AdminPanel({ children, className, title, description }: { children: React.ReactNode; className?: string; title?: string; description?: string }) {
-  return <section className={cn("admin-panel", className)}>{(title || description) && <header className="admin-panel-header">{title && <h2>{title}</h2>}{description && <p>{description}</p>}</header>}{children}</section>;
+export function AdminPanel({ children, className, title, description, dialog, actions }: { children: React.ReactNode; className?: string; title?: string; description?: string; dialog?: string; actions?: React.ReactNode }) {
+  return <section className={cn("admin-panel", dialog && "admin-panel--action", className)}>{(title || description || actions) && <header className="admin-panel-header"><div>{title && <h2>{title}</h2>}{description && <p>{description}</p>}</div>{actions}</header>}{dialog ? <AdminFormDialog title={title ?? dialog} description={description} triggerLabel={dialog}>{children}</AdminFormDialog> : children}</section>;
 }
 
-export function PrimaryLink({ children, href }: { children: React.ReactNode; href: string }) { return <Link className="admin-button admin-button-primary" href={href}>{children}</Link>; }
-export function SecondaryLink({ children, href }: { children: React.ReactNode; href: string }) { return <Link className="admin-button admin-button-secondary" href={href}>{children}</Link>; }
+export function PrimaryLink({ children, href }: { children: React.ReactNode; href: string }) { return <Link className="admin-button admin-button-primary" href={href} prefetch={false}>{children}</Link>; }
+export function SecondaryLink({ children, href }: { children: React.ReactNode; href: string }) { return <Link className="admin-button admin-button-secondary" href={href} prefetch={false}>{children}</Link>; }
