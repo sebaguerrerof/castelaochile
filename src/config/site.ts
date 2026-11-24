@@ -29,7 +29,7 @@ export const siteConfig = {
   mode: siteMode,
   isReview: siteMode === "review",
   url: explicitlyConfiguredUrl ?? vercelDeploymentUrl ?? LOCAL_REVIEW_URL,
-  title: "Instituto Castelao Chile | Información institucional",
+  title: "Instituto Castelao Chile | Tratamiento de adicciones en Santiago",
   description:
-    "Información institucional de Instituto Castelao Chile. Un espacio digital de orientación general y contenido en proceso de validación local.",
+    "Tratamiento ambulatorio especializado en adicciones para pacientes y familias en Ñuñoa, Santiago: terapia individual y grupal, acompañamiento y seguimiento terapéutico.",
 } as const;

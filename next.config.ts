@@ -23,6 +23,9 @@ const scriptSources = [
   process.env.NODE_ENV === "development" ? "'unsafe-eval'" : null,
 ].filter(Boolean).join(" ");
 
+// Same rule as src/config/site.ts: anything but "production" is review mode and must not be indexed.
+const reviewMode = process.env.NEXT_PUBLIC_SITE_MODE !== "production";
+
 const nextConfig: NextConfig = {
   serverExternalPackages: ["pdfkit"],
   outputFileTracingIncludes: {"/admin/seguimiento/informes/*": ["./public/brand/instituto-castelao-horizontal.png"]},
@@ -46,6 +49,7 @@ const nextConfig: NextConfig = {
       source: "/:path*",
       headers: [
         { key: "Content-Security-Policy", value: `default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src ${imageSources}; connect-src ${connectSources}; script-src ${scriptSources}; style-src 'self' 'unsafe-inline'; font-src 'self' data:${isolatedHttpQA || process.env.NODE_ENV === "development" ? "" : "; upgrade-insecure-requests"}` },
+        ...(reviewMode ? [{ key: "X-Robots-Tag", value: "noindex, nofollow, noarchive" }] : []),
         { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
         { key: "X-Content-Type-Options", value: "nosniff" },
         { key: "X-Frame-Options", value: "DENY" },

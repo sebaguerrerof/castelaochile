@@ -8,6 +8,7 @@ import { FloatingWhatsApp } from "@/components/shared/floating-whatsapp";
 import { isAnalyticsEnabled } from "@/lib/runtime-config";
 import { getCmsNavigation, getSiteSettings, settingsContact } from "@/lib/cms/repository";
 import { JsonLd } from "@/components/cms/cms-page";
+import { organizationJsonLd } from "@/lib/seo-schema";
 import { siteConfig } from "@/config/site";
 
 import "./public-content.css";
@@ -19,7 +20,7 @@ export default async function PublicLayout({ children }: Readonly<{ children: Re
   const [items, settings] = await Promise.all([getCmsNavigation(), getSiteSettings()]);
   return <div className="public-site">
     <a className="skip-link" href="#main-content">Saltar al contenido</a>
-    <JsonLd data={{ "@context": "https://schema.org", "@type": "Organization", name: siteConfig.name, url: siteConfig.url, ...(settings.email ? { email: settings.email } : {}), ...(settings.phone ? { telephone: settings.phone } : {}), sameAs: [settings.instagram, settings.facebook, settings.linkedin].filter(Boolean), ...(settings.streetAddress ? { address: { "@type": "PostalAddress", streetAddress: settings.streetAddress, addressLocality: settings.city, addressRegion: settings.region, addressCountry: settings.country } } : {}) }} />
+    <JsonLd data={organizationJsonLd({ name: siteConfig.name, url: siteConfig.url, description: siteConfig.description, email: settings.email, phone: settings.phone, whatsapp: settings.whatsapp, streetAddress: settings.streetAddress, city: settings.city, region: settings.region, country: settings.country, mapsUrl: settings.mapsUrl, sameAs: [settings.instagram, settings.facebook, settings.linkedin] })} />
     <Header evaluationLabel={settings.evaluationLabel} evaluationUrl={settings.evaluationUrl} items={items} navigationGroups={settings.navigationGroups} whatsapp={settings.whatsapp} />
     <ScrollReveal />
     <main id="main-content">{children}</main>

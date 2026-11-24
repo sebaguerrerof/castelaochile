@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 
 import { siteConfig } from "@/config/site";
+import { defaultShareImage } from "@/lib/share-image";
+import { buildSeoTitle } from "@/lib/seo-title";
 
 type PageMetadataInput = {
   title: string;
@@ -8,9 +10,10 @@ type PageMetadataInput = {
   path: string;
 };
 
-export function createPageMetadata({ title, description, path }: PageMetadataInput): Metadata {
+export function createPageMetadata({ title: rawTitle, description, path }: PageMetadataInput): Metadata {
+  const title = buildSeoTitle(rawTitle, siteConfig.name);
   return {
-    title,
+    title: { absolute: title },
     description,
     alternates: { canonical: path },
     openGraph: {
@@ -20,6 +23,8 @@ export function createPageMetadata({ title, description, path }: PageMetadataInp
       title,
       description,
       url: path,
+      images: [defaultShareImage(siteConfig.name)],
     },
+    twitter: { card: "summary_large_image", title, description, images: [defaultShareImage(siteConfig.name).url] },
   };
 }

@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Noto_Serif, PT_Sans, Volkhov } from "next/font/google";
 
+import { SHARE_IMAGE_PATH, defaultShareImage } from "@/lib/share-image";
 import { siteConfig } from "@/config/site";
 
 import "./globals.css";
@@ -13,7 +14,8 @@ const notoSerif = Noto_Serif({ variable: "--font-noto-serif", subsets: ["latin"]
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url), title: { default: siteConfig.title, template: `%s | ${siteConfig.name}` }, description: siteConfig.description,
   robots: siteConfig.isReview ? { index: false, follow: false, nocache: true } : undefined,
-  alternates: { canonical: "/" }, openGraph: { type: "website", locale: siteConfig.locale, siteName: siteConfig.name, title: siteConfig.title, description: siteConfig.description, url: "/" },
+  alternates: { canonical: "/" }, openGraph: { type: "website", locale: siteConfig.locale, siteName: siteConfig.name, title: siteConfig.title, description: siteConfig.description, url: "/", images: [defaultShareImage(siteConfig.name)] },
+  twitter: { card: "summary_large_image", images: [SHARE_IMAGE_PATH] },
   appleWebApp: { capable: true, title: "Castelao Chile", statusBarStyle: "default" },
 };
 export const viewport: Viewport = { themeColor: "#0079BE", viewportFit: "cover", interactiveWidget: "resizes-content" };
