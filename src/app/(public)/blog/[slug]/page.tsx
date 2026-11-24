@@ -8,19 +8,23 @@ import { SafeHtml } from "@/components/content/safe-html";
 import { SafeMarkdown } from "@/components/content/safe-markdown";
 import { Container } from "@/components/layout/container";
 import { CTASection } from "@/components/shared/cta-section";
+import { SHARE_IMAGE_PATH, defaultShareImage } from "@/lib/share-image";
+import { buildSeoTitle } from "@/lib/seo-title";
 import { siteConfig } from "@/config/site";
 import { getPublishedPost, listRelatedBlogPosts } from "@/lib/repositories/content-repository";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params; const post = await getPublishedPost("blog", slug);
   if (!post) return { robots: { index: false, follow: false } };
-  const title = post.seoTitle ?? post.title;
+  const title = buildSeoTitle(post.seoTitle ?? post.title, siteConfig.name);
   const description = post.seoDescription ?? post.summary;
   const image = post.coverImagePath ? `/api/public/media/blog/${post.slug}` : undefined;
   return {
-    title, description, alternates: { canonical: `/blog/${post.slug}` },
-    openGraph: { type: "article", locale: siteConfig.locale, siteName: siteConfig.name, title, description, url: `/blog/${post.slug}`, publishedTime: post.publishedAt, modifiedTime: post.updatedAt, authors: post.authorName ? [post.authorName] : undefined, section: post.categories[0]?.name, images: image ? [{ url: image, alt: post.coverAlt ?? post.title }] : undefined },
-    twitter: { card: image ? "summary_large_image" : "summary", title, description, images: image ? [image] : undefined },
+    title: { absolute: title }, description, alternates: { canonical: `/blog/${post.slug}` },
+    // Articles synchronised from Instituto Castelao España duplicate that site's text: keep them readable and linked, but out of the index.
+    ...(post.origin === "castelao_es" ? { robots: { index: false, follow: true } } : {}),
+    openGraph: { type: "article", locale: siteConfig.locale, siteName: siteConfig.name, title, description, url: `/blog/${post.slug}`, publishedTime: post.publishedAt, modifiedTime: post.updatedAt, authors: post.authorName ? [post.authorName] : undefined, section: post.categories[0]?.name, images: image ? [{ url: image, alt: post.coverAlt ?? post.title }] : [defaultShareImage(siteConfig.name)] },
+    twitter: { card: "summary_large_image", title, description, images: [image ?? SHARE_IMAGE_PATH] },
   };
 }
 

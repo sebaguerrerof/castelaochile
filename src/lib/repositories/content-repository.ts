@@ -162,7 +162,7 @@ export async function listSitemapPosts() {
   if (!hasSupabasePublicConfig()) return [];
   const supabase = await createServerSupabaseClient();
   const { data, error } = await supabase.from("content_posts").select("kind, slug, updated_at")
-    .eq("status", "published").lte("published_at", new Date().toISOString()).order("published_at", { ascending: false });
+    .eq("status", "published").neq("origin", "castelao_es").lte("published_at", new Date().toISOString()).order("published_at", { ascending: false });
   if (error) throw new Error("Could not load sitemap content.");
   return data;
 }

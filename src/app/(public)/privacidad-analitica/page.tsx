@@ -3,8 +3,9 @@ import type { Metadata } from "next";
 
 import { Container } from "@/components/layout/container";
 import { PageHero } from "@/components/shared/page-hero";
+import { createPageMetadata } from "@/lib/page-metadata";
 
-export const metadata: Metadata = { title: "Privacidad de la analítica | Instituto Castelao Chile" };
+export const metadata: Metadata = createPageMetadata({ title: "Privacidad de la analítica", description: "Cómo medimos las visitas en el sitio de Instituto Castelao Chile: qué se guarda, por cuánto tiempo y cómo rechazar o retirar tu permiso.", path: "/privacidad-analitica" });
 
 export default function AnalyticsPrivacyPage() {
   return <>
