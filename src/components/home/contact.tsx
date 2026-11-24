@@ -10,45 +10,10 @@ import { assets } from "@/config/assets";
 import { contactConfig } from "@/config/contact";
 import { homeContent } from "@/content/home";
 import { getContactActions } from "@/lib/contact-links";
+import { isContactIntakeEnabled, runtimeConfig } from "@/lib/runtime-config";
 
 export function Contact() {
   const actions = getContactActions(contactConfig);
-
-  return (
-    <Section id="contacto">
-      <div className="contact-scene overflow-hidden rounded-[var(--radius-xl)]">
-        <div className="grid lg:grid-cols-[0.82fr_1.18fr] lg:items-stretch">
-          <Reveal className="contact-scene__content" origin="left">
-            <SectionHeading
-              description={homeContent.contact.description}
-              eyebrow={homeContent.contact.eyebrow}
-              inverted
-              title={homeContent.contact.title}
-            />
-            {actions.length > 0 ? (
-              <div className="mt-8">
-                <ContactActions actions={actions} variant="inverted" />
-              </div>
-            ) : (
-              <div className="contact-scene__assurance">
-                <ShieldCheck aria-hidden="true" className="size-5" />
-                <span>Los datos de contacto se publicarán solo después de validación institucional.</span>
-              </div>
-            )}
-            <EditorialImage
-              asset={assets.images.contact}
-              className="contact-scene__supporting-image mt-8 h-[12rem] sm:h-[15rem]"
-              sizes="(max-width: 1023px) 100vw, 35vw"
-            />
-          </Reveal>
-          <Reveal className="contact-scene__form-area" delay="sm" origin="right">
-            <div className="contact-form__demo-wrap">
-              <MailQuestion aria-hidden="true" className="contact-form__demo-icon size-5" />
-              <ContactForm />
-            </div>
-          </Reveal>
-        </div>
-      </div>
-    </Section>
-  );
+  const intakeEnabled = isContactIntakeEnabled();
+  return <Section id="contacto"><div className="contact-scene overflow-hidden rounded-[var(--radius-xl)]"><div className="grid lg:grid-cols-[0.82fr_1.18fr] lg:items-stretch"><Reveal className="contact-scene__content" origin="left"><SectionHeading description={homeContent.contact.description} eyebrow={homeContent.contact.eyebrow} inverted title={homeContent.contact.title} />{actions.length > 0 ? <div className="mt-8"><ContactActions actions={actions} variant="inverted" /></div> : <div className="contact-scene__assurance"><ShieldCheck aria-hidden="true" className="size-5" /><span>Los datos de contacto se publicarán solo después de validación institucional.</span></div>}<EditorialImage asset={assets.images.contact} className="contact-scene__supporting-image mt-8 h-[12rem] sm:h-[15rem]" sizes="(max-width: 1023px) 100vw, 35vw" /></Reveal><Reveal className="contact-scene__form-area" delay="sm" origin="right"><div className="contact-form__demo-wrap"><MailQuestion aria-hidden="true" className="contact-form__demo-icon size-5" /><ContactForm consentLabel={intakeEnabled ? runtimeConfig.contactPrivacyConsentLabel ?? null : null} enabled={intakeEnabled} privacyPolicyUrl={intakeEnabled ? runtimeConfig.contactPrivacyPolicyUrl ?? null : null} /></div></Reveal></div></div></Section>;
 }

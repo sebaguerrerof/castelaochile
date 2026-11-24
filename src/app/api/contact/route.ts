@@ -1,115 +1,117 @@
 import { NextResponse } from "next/server";
+import { z } from "zod";
 
-import { createContactSubmissionService, getContactFormMode } from "@/lib/server/contact-runtime";
+import { parseContactSubmission } from "@/lib/contact-form-schema";
+import { isContactIntakeEnabled, runtimeConfig } from "@/lib/runtime-config";
+import { persistContactSubmission } from "@/lib/server/contact-submission-repository";
+import { UpstashRateLimiter } from "@/lib/server/rate-limit";
 
 export const runtime = "nodejs";
 
-const MAX_PAYLOAD_BYTES = 12_000;
+const maxPayloadBytes = 12_000;
+const idempotencyKeySchema = z.uuid();
+const sourcePathSchema = z.string().regex(/^\/[A-Za-z0-9/_-]*$/).max(180);
 
-type BodyReadResult =
-  | { kind: "ok"; body: unknown }
-  | { kind: "invalid" }
-  | { kind: "too-large" };
-
-async function readLimitedBody(request: Request): Promise<BodyReadResult> {
-  const reader = request.body?.getReader();
-  if (!reader) return { kind: "invalid" };
-
-  const decoder = new TextDecoder("utf-8", { fatal: true });
-  let text = "";
-  let bytes = 0;
-
-  try {
-    while (true) {
-      const chunk = await reader.read();
-      if (chunk.done) break;
-      bytes += chunk.value.byteLength;
-      if (bytes > MAX_PAYLOAD_BYTES) {
-        await reader.cancel();
-        return { kind: "too-large" };
-      }
-      text += decoder.decode(chunk.value, { stream: true });
-    }
-    text += decoder.decode();
-    return { kind: "ok", body: JSON.parse(text) as unknown };
-  } catch {
-    return { kind: "invalid" };
-  } finally {
-    reader.releaseLock();
-  }
-}
+type BodyResult = { body: unknown; tooLarge: false } | { body: null; tooLarge: true };
 
 function hasSameOrigin(request: Request) {
-  const origin = request.headers.get("origin");
-  if (!origin) return false;
   try {
-    return new URL(origin).origin === new URL(request.url).origin;
+    const origin = request.headers.get("origin");
+    return Boolean(origin && new URL(origin).origin === new URL(request.url).origin);
   } catch {
     return false;
   }
 }
 
-function requestClientKey(request: Request) {
-  const forwarded = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim();
-  return forwarded || request.headers.get("x-real-ip") || "unknown";
+function clientKey(request: Request) {
+  return request.headers.get("x-forwarded-for")?.split(",")[0]?.trim()
+    || request.headers.get("x-real-ip")
+    || "unknown";
+}
+
+/** Enforces the wire-size limit even when the client sends a chunked body. */
+async function readLimitedJson(request: Request): Promise<BodyResult> {
+  const contentLength = Number(request.headers.get("content-length") ?? "0");
+  if (!Number.isFinite(contentLength) || contentLength > maxPayloadBytes) return { body: null, tooLarge: true };
+
+  const reader = request.body?.getReader();
+  if (!reader) return { body: null, tooLarge: false };
+
+  const chunks: Uint8Array[] = [];
+  let received = 0;
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      received += value.byteLength;
+      if (received > maxPayloadBytes) {
+        await reader.cancel();
+        return { body: null, tooLarge: true };
+      }
+      chunks.push(value);
+    }
+  } finally {
+    reader.releaseLock();
+  }
+
+  try {
+    return { body: JSON.parse(new TextDecoder().decode(Buffer.concat(chunks))), tooLarge: false };
+  } catch {
+    return { body: null, tooLarge: false };
+  }
 }
 
 export async function POST(request: Request) {
-  if (!hasSameOrigin(request)) {
-    return NextResponse.json({ ok: false, message: "Solicitud no autorizada." }, { status: 403 });
+  if (!isContactIntakeEnabled()) {
+    return NextResponse.json(
+      { ok: false, message: "El formulario aún no está disponible públicamente." },
+      { status: 503, headers: { "Cache-Control": "no-store" } },
+    );
   }
-
+  if (!hasSameOrigin(request)) return NextResponse.json({ ok: false, message: "Solicitud no autorizada." }, { status: 403 });
   if (request.headers.get("content-type")?.split(";")[0] !== "application/json") {
     return NextResponse.json({ ok: false, message: "La solicitud no es válida." }, { status: 415 });
   }
 
-  const contentLength = Number(request.headers.get("content-length") ?? "0");
-  if (!Number.isFinite(contentLength) || contentLength > MAX_PAYLOAD_BYTES) {
-    return NextResponse.json({ ok: false, message: "La solicitud supera el tamaño permitido." }, { status: 413 });
-  }
+  const input = await readLimitedJson(request);
+  if (input.tooLarge) return NextResponse.json({ ok: false, message: "La solicitud supera el tamaño permitido." }, { status: 413 });
+  if (!input.body) return NextResponse.json({ ok: false, message: "La solicitud no es válida." }, { status: 400 });
 
-  const payload = await readLimitedBody(request);
-  if (payload.kind === "too-large") {
-    return NextResponse.json({ ok: false, message: "La solicitud supera el tamaño permitido." }, { status: 413 });
-  }
-  if (payload.kind === "invalid") {
+  const parsed = parseContactSubmission(input.body);
+  if (!parsed.success) return NextResponse.json({ ok: false, errors: parsed.errors }, { status: 422 });
+  if (parsed.data.website) return new NextResponse(null, { status: 204 });
+
+  const sourcePath = sourcePathSchema.safeParse(
+    typeof input.body === "object" && input.body ? (input.body as Record<string, unknown>).sourcePath : null,
+  );
+  const idempotencyKey = idempotencyKeySchema.safeParse(request.headers.get("x-idempotency-key"));
+  if (!sourcePath.success || !idempotencyKey.success) {
     return NextResponse.json({ ok: false, message: "La solicitud no es válida." }, { status: 400 });
   }
 
-  const mode = getContactFormMode();
-  if (mode === "unavailable") {
+  const limiter = new UpstashRateLimiter(runtimeConfig.upstashUrl!, runtimeConfig.upstashToken!, {
+    maxRequests: 3,
+    windowSeconds: 600,
+  });
+  const decision = await limiter.check(`contact:${clientKey(request)}`);
+  if (!decision.allowed) {
     return NextResponse.json(
-      { ok: false, message: "El formulario aún no está disponible públicamente." },
-      { status: 503 },
+      { ok: false, message: "Espera unos minutos antes de intentar nuevamente." },
+      { status: 429, headers: { "Retry-After": String(decision.retryAfterSeconds) } },
     );
   }
 
-  const outcome = await createContactSubmissionService(mode).submit(payload.body, requestClientKey(request));
-  if (outcome.status === "invalid") {
-    return NextResponse.json({ ok: false, errors: outcome.errors }, { status: 422 });
-  }
-  if (outcome.status === "blocked") return new NextResponse(null, { status: 204 });
-  if (outcome.status === "rate-limited") {
-    return NextResponse.json(
-      { ok: false, message: "Espera unos minutos antes de intentar nuevamente." },
-      { status: 429, headers: { "Retry-After": String(outcome.retryAfterSeconds) } },
-    );
-  }
-  if (outcome.status === "delivery-failed") {
+  try {
+    await persistContactSubmission(parsed.data, sourcePath.data, idempotencyKey.data);
+  } catch {
     return NextResponse.json(
       { ok: false, message: "No pudimos procesar el mensaje. Intenta nuevamente más tarde." },
-      { status: 502 },
+      { status: 503, headers: { "Cache-Control": "no-store" } },
     );
   }
 
   return NextResponse.json(
-    mode === "preview"
-      ? {
-          ok: true,
-          mode: "preview",
-          message: "La prueba se validó localmente; no se envió ni se guardó ningún mensaje.",
-        }
-      : { ok: true, mode: "active", message: "Tu mensaje fue recibido correctamente." },
-    { status: mode === "preview" ? 202 : 200 },
+    { ok: true, message: "Tu consulta fue recibida correctamente." },
+    { status: 201, headers: { "Cache-Control": "no-store" } },
   );
 }

@@ -13,4 +13,7 @@
 !public
 !public/**
 !vercel.json
+!scripts
+/scripts/*
+!scripts/copy-pdf-worker.mjs
 !.vercelignore

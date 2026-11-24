@@ -1,53 +1,28 @@
-import type { ReactNode } from "react";
-
-import type { LocalImageAsset } from "@/config/assets";
-import { cn } from "@/lib/utils";
+import Image from "next/image";
 
 import { Container } from "@/components/layout/container";
 import { Breadcrumbs } from "@/components/shared/breadcrumbs";
-import { EditorialImage } from "@/components/shared/editorial-image";
 
-type PageHeroProps = {
-  eyebrow: string;
-  title: string;
-  description: string;
-  image: LocalImageAsset;
-  current: string;
-  variant?: "blue" | "mist" | "warm";
-  children?: ReactNode;
-};
+const DEFAULT_IMAGE = { src: "/images/instituto-sala-azul.webp", alt: "Interior de una sala del Instituto Castelao" };
 
-export function PageHero({
-  eyebrow,
-  title,
-  description,
-  image,
-  current,
-  variant = "blue",
-  children,
-}: PageHeroProps) {
-  return (
-    <section className={cn("page-hero", `page-hero--${variant}`)}>
-      <Container className="page-hero__container">
-        <Breadcrumbs current={current} />
-        <div className="page-hero__grid">
-          <div className="page-hero__copy">
-            <p className="page-hero__eyebrow eyebrow">{eyebrow}</p>
-            <h1 className="page-hero__title">{title}</h1>
-            <p className="page-hero__description">{description}</p>
-            {children ? <div className="page-hero__actions page-hero__actions--motion">{children}</div> : null}
-          </div>
-          <div className="page-hero__image-wrap page-hero__image-wrap--motion">
-            <EditorialImage
-              asset={image}
-              className="page-hero__image"
-              priority
-              sizes="(max-width: 767px) 100vw, (max-width: 1023px) 44vw, 36vw"
-            />
-            <span aria-hidden="true" className="page-hero__accent" />
-          </div>
+type PageHeroProps = { title: string; description?: string; current?: string; image?: { src: string; alt: string } };
+
+/**
+ * Opening for pages that are not built from CMS blocks (blog, news, privacy).
+ * It reuses the markup and styles of the CMS hero so every page opens the same way.
+ */
+export function PageHero({ title, description, current = title, image = DEFAULT_IMAGE }: PageHeroProps) {
+  return <section className="cms-hero cms-hero--blue cms-hero--with-image">
+    <Image alt={image.alt} className="cms-hero__image" fetchPriority="high" fill preload quality={60} sizes="100vw" src={image.src} />
+    <div aria-hidden="true" className="cms-hero__veil" />
+    <Container className="cms-hero__container">
+      <Breadcrumbs current={current} />
+      <div className="cms-hero__layout">
+        <div className="cms-hero__copy">
+          <h1>{title}</h1>
+          {description && <p className="cms-hero__subtitle">{description}</p>}
         </div>
-      </Container>
-    </section>
-  );
+      </div>
+    </Container>
+  </section>;
 }

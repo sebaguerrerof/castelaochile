@@ -1,0 +1,1 @@
+export default function LibraryLoading() {return <div role="status" aria-label="Cargando tu información" className="library-grid">{Array.from({length:6},(_,i)=><div className="library-skeleton" key={i}/>)}<span className="sr-only">Cargando…</span></div>;}

@@ -27,7 +27,7 @@ export function EditorialImage({
         alt={asset.alt}
         className={cn("editorial-image__image", imageClassName)}
         fill
-        priority={priority}
+        preload={priority}
         sizes={sizes}
         src={asset.src}
         style={{ objectPosition: asset.objectPosition }}

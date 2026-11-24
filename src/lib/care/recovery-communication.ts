@@ -1,0 +1,3 @@
+import { z } from "zod";
+export const recoveryCommunicationSchema=z.object({id:z.uuid(),request_id:z.uuid(),version:z.coerce.number().int().nonnegative(),recipient_id:z.uuid(),channel:z.string().trim().min(3).max(100),occurred_at:z.iso.datetime({offset:true}),reason:z.string().trim().min(3).max(300),confirm:z.literal(true)});
+export const recoveryCommunicationContextSchema=z.object({can_write:z.boolean(),recipients:z.array(z.object({id:z.uuid(),label:z.string()})),rows:z.array(z.object({id:z.uuid(),revision:z.number().int().positive(),request_id:z.uuid(),channel:z.string(),occurred_at:z.string(),recipient_id:z.uuid(),recipient_label:z.string(),actor_id:z.uuid(),actor_label:z.string(),recorded_at:z.string(),reason:z.string()}))});

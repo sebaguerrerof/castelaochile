@@ -1,0 +1,124 @@
+/*
+ * Design tokens: the single source of truth for the public design system.
+ * Components and pages consume these variables; they never hard-code values.
+ *
+ * Brand primitives come from the corporate identity manual (pp. 9-11) and are
+ * used as the manual shows them. The orange (~2.8:1) and gray (~3.6:1) cannot
+ * carry text on white at WCAG AA, so they are decorative only; text uses the
+ * blue or the ink. Pairs are verified by tests/design-tokens.test.ts.
+ */
+:root {
+  /* ---- Brand primitives (manual) ---- */
+  --brand-blue: #0079be;
+  --brand-orange: #da8a1b;
+  --brand-gray: #868685;
+
+  /* ---- Neutral and hover tones already used by the site (not corporate colours) ---- */
+  --brand-blue-deep: #005c90;      /* hover and dark surfaces only */
+  --brand-blue-bright: #008dcc;
+  --ink: #183044;
+  --ink-soft: #526574;
+  --mist: #edf6fa;
+  --line: #c7dbe6;
+  --canvas: #f3f7f9;
+
+  /* ---- Semantic roles ---- */
+  --background: #ffffff;
+  --foreground: var(--ink);
+  --surface: #ffffff;
+  --surface-muted: var(--mist);
+  --primary: var(--brand-blue);
+  --primary-foreground: #ffffff;
+  --on-dark-soft: #e6eef4;
+  --hover-fill: color-mix(in srgb, var(--brand-blue-deep) 85%, transparent); /* white text on it stays above 5:1 */
+  --veil-strong: rgb(8 36 58 / 0.88);   /* photo veil, left to right */
+  --veil-mid: rgb(8 36 58 / 0.62);
+  --veil-soft: rgb(8 36 58 / 0.3);
+  --secondary: #e6f3f9;
+  --secondary-foreground: #075a8d;
+  --accent: var(--brand-orange);       /* decorative only, never text */
+  --accent-foreground: #2d1a05;        /* the only text colour allowed on accent */
+  --border: var(--line);
+  --muted: var(--canvas);
+  --muted-foreground: var(--ink-soft);
+  --ring: var(--brand-blue);
+  --destructive: #b42318;
+  --success: #0d6840;
+  --success-surface: #e7f5ed;
+  --whatsapp: #25d366;
+  --whatsapp-hover: color-mix(in srgb, var(--whatsapp) 84%, black);
+
+  /* ---- Typography families (manual p. 14) ---- */
+  --font-nav: Arial, Helvetica, sans-serif;
+  --font-body: Arial, Helvetica, sans-serif;
+  --font-heading: var(--font-pt-sans), Arial, Helvetica, sans-serif;
+  --font-quote: var(--font-volkhov), Georgia, serif;
+  --font-gallery: var(--font-noto-serif), Georgia, serif; /* successor of Droid Serif */
+
+  /* ---- Type scale (fluid, 1.2 ratio on small screens widening on large) ---- */
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-md: 1.125rem;
+  --text-lg: clamp(1.25rem, 1.15rem + 0.5vw, 1.5rem);
+  --text-xl: clamp(1.5rem, 1.3rem + 1vw, 2rem);
+  --text-2xl: clamp(1.875rem, 1.5rem + 1.8vw, 2.75rem);
+  --text-3xl: clamp(2.25rem, 1.7rem + 2.7vw, 3.5rem);
+  --text-display: clamp(2.5rem, 1.8rem + 3.4vw, 4.5rem);
+  --leading-tight: 1.1;
+  --leading-heading: 1.2;
+  --leading-body: 1.6;
+  --tracking-heading: -0.02em;
+  --tracking-ui: 0.04em;
+  --measure: 68ch;
+
+  /* ---- Space (4px base) ---- */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+  --space-8: 4rem;
+  --space-9: 6rem;
+  --section-space: 4.5rem;
+  --content-max: 80rem;
+
+  /* ---- Shape and depth ---- */
+  --radius: 0.75rem;
+  --radius-xl: 1.25rem;
+  --radius-pill: 999px;
+  --shadow-primary: 0 12px 28px rgb(0 121 190 / 18%);
+  --shadow-soft: 0 18px 46px rgb(24 48 68 / 10%);
+  --shadow-image: 0 26px 55px rgb(24 48 68 / 18%);
+
+
+  /* ---- Motion ---- */
+  --motion-fast: 180ms;
+  --motion-menu: 220ms;
+  --motion-page: 280ms;
+  --motion-reveal: 560ms;
+  --motion-stagger: 80ms;
+  --motion-distance: 0.875rem;
+  --app-safe-top: env(safe-area-inset-top, 0px);
+  --app-safe-right: env(safe-area-inset-right, 0px);
+  --app-safe-bottom: env(safe-area-inset-bottom, 0px);
+  --app-safe-left: env(safe-area-inset-left, 0px);
+  --motion-fast: 220ms;
+  --motion-base: 380ms;
+  --motion-slow: 680ms;
+  --ease-emphasized: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@media (min-width: 640px) {
+  :root {
+    --section-space: 5.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --section-space: 7rem;
+  }
+}

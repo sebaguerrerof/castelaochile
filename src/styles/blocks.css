@@ -1,0 +1,891 @@
+/*
+ * Presentation of CMS blocks. Direction B ("La consulta"): luminous surfaces, the
+ * manual's blue only on actions and titles, orange only as the logo's "eye".
+ * Every value comes from tokens.css.
+ */
+
+/* ---- Hero ---- */
+.cms-hero {
+  background: var(--surface);
+  color: var(--foreground);
+}
+
+.cms-hero--mist {
+  background: var(--surface-muted);
+}
+
+.cms-hero--warm {
+  background: color-mix(in srgb, var(--brand-orange) 7%, var(--surface));
+}
+
+.cms-hero__container {
+  padding-block: var(--space-5) var(--space-8);
+}
+
+.cms-hero .breadcrumbs {
+  margin-bottom: var(--space-6);
+}
+
+.cms-hero .breadcrumbs ol,
+.cms-hero .breadcrumbs li,
+.cms-hero .breadcrumbs a {
+  color: var(--foreground);
+  font-size: var(--text-xs);
+}
+
+.cms-hero__layout {
+  display: grid;
+  align-items: center;
+  gap: var(--space-7);
+}
+
+.cms-hero--with-image .cms-hero__layout {
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+}
+
+.cms-hero--text .cms-hero__copy {
+  max-width: 55rem;
+}
+
+.cms-hero__logo {
+  margin-bottom: var(--space-6);
+}
+
+.cms-hero h1 {
+  margin: 0;
+  color: var(--brand-blue);
+  font-family: var(--font-heading);
+  font-size: var(--text-3xl);
+  font-weight: 700;
+  letter-spacing: var(--tracking-heading);
+  line-height: var(--leading-tight);
+  text-wrap: balance;
+}
+
+.cms-hero--home h1 {
+  font-size: var(--text-display);
+}
+
+.cms-hero__status {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+  color: var(--foreground);
+  font-size: var(--text-sm);
+  font-weight: 700;
+}
+
+.cms-hero__subtitle {
+  max-width: var(--measure);
+  margin-top: var(--space-5);
+  color: var(--foreground);
+  font-size: var(--text-lg);
+  font-weight: 700;
+  line-height: var(--leading-heading);
+}
+
+.cms-hero__description {
+  max-width: var(--measure);
+  margin-top: var(--space-4);
+  color: var(--muted-foreground);
+  font-size: var(--text-md);
+  line-height: var(--leading-body);
+}
+
+.cms-hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin-top: var(--space-6);
+}
+
+.cms-hero__photo {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  border-radius: var(--radius-xl);
+}
+
+.cms-hero__image {
+  object-fit: cover;
+}
+
+@media (max-width: 1023px) {
+  .cms-hero--with-image .cms-hero__layout {
+    grid-template-columns: 1fr;
+  }
+
+  .cms-hero__photo {
+    aspect-ratio: 4 / 3;
+  }
+}
+
+/* ---- Section headings: the title carries its own weight, no bar or label above it ---- */
+.cms-section-heading {
+  max-width: 46rem;
+}
+
+.cms-section-heading h2 {
+  color: var(--foreground);
+  font-size: var(--text-2xl);
+  font-weight: 700;
+  letter-spacing: var(--tracking-heading);
+  line-height: var(--leading-heading);
+  text-wrap: balance;
+}
+
+.cms-cta .cms-section-heading h2 {
+  color: var(--primary-foreground);
+}
+
+/* ---- Principles: a marked list ---- */
+.cms-section--feature_cards,
+.cms-section--principles,
+.cms-section--stats {
+  background: var(--surface-muted);
+}
+
+.cms-principles {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-5) var(--space-7);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cms-principles li {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-4);
+}
+
+.cms-principles .ds-eye {
+  margin-top: 0.4em;
+}
+
+/* ---- Shared item typography ---- */
+.cms-principles :is(h2, h3),
+.cms-steps :is(h2, h3),
+.cms-rows :is(h2, h3),
+.cms-link-card :is(h2, h3) {
+  margin: 0;
+  color: var(--foreground);
+  font-family: var(--font-heading);
+  font-size: var(--text-md);
+  font-weight: 700;
+  line-height: var(--leading-heading);
+}
+
+.cms-item__subtitle {
+  margin-top: var(--space-2);
+  color: var(--foreground);
+  font-weight: 700;
+}
+
+.cms-item__description {
+  max-width: var(--measure);
+  margin-top: var(--space-2);
+  color: var(--muted-foreground);
+  font-size: var(--text-base);
+  line-height: var(--leading-body);
+}
+
+.cms-item__description p + p {
+  margin-top: 1em;
+}
+
+/* ---- Steps: numbered because the order carries meaning ---- */
+.cms-steps {
+  display: grid;
+  gap: var(--space-5);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cms-steps li {
+  display: grid;
+  grid-template-columns: 3rem minmax(0, 1fr);
+  gap: var(--space-4);
+  border-top: 1px solid var(--border);
+  padding-top: var(--space-5);
+}
+
+.cms-steps__number {
+  color: var(--brand-blue);
+  font-family: var(--font-heading);
+  font-size: var(--text-xl);
+  font-weight: 700;
+  line-height: 1;
+}
+
+/* ---- Rows: plain feature items without a link ---- */
+.cms-rows {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cms-rows li {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  gap: var(--space-2) var(--space-7);
+  border-top: 1px solid var(--border);
+  padding-block: var(--space-5);
+}
+
+.cms-rows li:last-child {
+  border-bottom: 1px solid var(--border);
+}
+
+.cms-rows li > :is(h2, h3) {
+  grid-column: 1;
+  grid-row: 1 / span 3;
+  font-size: var(--text-lg);
+}
+
+.cms-rows li > :not(h2):not(h3) {
+  grid-column: 2;
+}
+
+/* ---- Link cards: a card only when the whole item is a link ---- */
+.cms-link-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
+  gap: var(--space-5);
+}
+
+.cms-link-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-6);
+  text-decoration: none;
+}
+
+.cms-link-card :is(h2, h3) {
+  font-size: var(--text-lg);
+}
+
+.cms-link-card__action {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: auto;
+  padding-top: var(--space-4);
+  color: var(--brand-blue);
+  font-family: var(--font-nav);
+  font-size: var(--text-sm);
+  font-weight: 700;
+}
+
+/* ---- Warning (Notice inside a page section) ---- */
+.cms-warning {
+  padding-block: var(--space-6);
+}
+
+@media (max-width: 767px) {
+  .cms-principles {
+    grid-template-columns: 1fr;
+  }
+
+  .cms-rows li {
+    grid-template-columns: 1fr;
+  }
+
+  .cms-rows li > :is(h2, h3),
+  .cms-rows li > :not(h2):not(h3) {
+    grid-column: 1;
+    grid-row: auto;
+  }
+}
+
+/* ---- Hero with photograph: full-bleed image, dark blue veil, white type ---- */
+.cms-hero--with-image {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  min-height: min(82vh, 48rem);
+  overflow: hidden;
+  background: var(--brand-blue-deep);
+  color: var(--primary-foreground);
+}
+
+.cms-hero--with-image .cms-hero__image {
+  object-fit: cover;
+}
+
+.cms-hero__veil {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, var(--veil-strong) 0%, var(--veil-mid) 55%, var(--veil-soft) 100%);
+}
+
+.cms-hero--with-image .cms-hero__container {
+  position: relative;
+  width: 100%;
+  padding-block: var(--space-6) var(--space-9);
+}
+
+.cms-hero--with-image .cms-hero__layout {
+  display: block;
+}
+
+.cms-hero--with-image .cms-hero__copy {
+  max-width: 44rem;
+}
+
+.cms-hero--with-image h1 {
+  color: var(--primary-foreground);
+  font-size: var(--text-display);
+  text-transform: uppercase;
+  line-height: 1.05;
+}
+
+.cms-hero--with-image :is(.cms-hero__status, .cms-hero__subtitle, .cms-hero__description),
+.cms-hero--with-image .breadcrumbs :is(ol, li, a) {
+  color: var(--primary-foreground);
+}
+
+.cms-hero--with-image .cms-hero__description {
+  color: var(--on-dark-soft);
+}
+
+.cms-hero--with-image .cms-hero__actions .public-button:first-child {
+  border-color: var(--brand-orange);
+  background: var(--brand-orange);
+  color: var(--ink);
+}
+
+.cms-hero--with-image .cms-hero__actions .public-button:first-child:hover {
+  background: var(--primary-foreground);
+  border-color: var(--primary-foreground);
+}
+
+/* ---- Page rhythm: generous sections that alternate white and mist ---- */
+.cms-page .cms-section {
+  padding-block: clamp(var(--space-8), 8vw, var(--space-9));
+}
+
+.cms-page .cms-section--feature_cards,
+.cms-page .cms-section--principles,
+.cms-page .cms-section--stats,
+.cms-page .cms-section--pricing {
+  background: var(--surface-muted);
+}
+
+.cms-page .cms-section-heading h2 {
+  font-size: var(--text-3xl);
+}
+
+.cms-page .cms-section--feature_cards .cms-section-heading,
+.cms-page .cms-section--pricing .cms-section-heading {
+  margin-bottom: var(--space-6);
+}
+
+/* ---- Link cards: large, solid, with a circular arrow ---- */
+.cms-page .cms-link-card {
+  min-height: 13rem;
+  border: 0;
+  border-radius: var(--radius-xl);
+  padding: var(--space-6) var(--space-6) var(--space-5);
+  box-shadow: var(--shadow-soft);
+}
+
+.cms-page .cms-link-card :is(h2, h3) {
+  font-size: var(--text-xl);
+  color: var(--brand-blue);
+}
+
+.cms-page .cms-link-cards .cms-link-card {
+  background: linear-gradient(var(--hover-fill), var(--hover-fill)) bottom / 100% 0 no-repeat var(--surface);
+  transition: background-size var(--motion-base) var(--ease-emphasized), color var(--motion-base) var(--ease-emphasized), box-shadow var(--motion-base) var(--ease-emphasized), transform var(--motion-base) var(--ease-emphasized);
+}
+
+.cms-page .cms-link-card:is(:hover, :focus-visible) {
+  background-size: 100% 100%;
+}
+
+.cms-page .cms-link-card :is(h2, h3, .cms-item__description, .cms-link-card__action) {
+  transition: color var(--motion-base) var(--ease-emphasized);
+}
+
+.cms-page .cms-link-card:is(:hover, :focus-visible) :is(h2, h3, .cms-item__description, .cms-link-card__action) {
+  color: var(--primary-foreground);
+}
+
+.cms-page .cms-link-card__action svg {
+  transition: background-color var(--motion-base) var(--ease-emphasized), color var(--motion-base) var(--ease-emphasized);
+  box-sizing: content-box;
+  padding: var(--space-2);
+  border-radius: 50%;
+  background: var(--brand-blue);
+  color: var(--primary-foreground);
+}
+
+/* ---- Price: solid blue panel ---- */
+.cms-page .cms-price-card {
+  border: 0;
+  border-radius: var(--radius-xl);
+  background: var(--brand-blue-deep);
+  box-shadow: var(--shadow-soft);
+  color: var(--primary-foreground);
+}
+
+.cms-page .cms-price-card :is(h3, .eyebrow, .cms-price-card__unit, .cms-price-card__note, .cms-price-card__note svg) {
+  color: var(--primary-foreground);
+}
+
+.cms-page .cms-price-card__note {
+  border-top-color: var(--veil-soft);
+}
+
+/* ---- Team card ---- */
+.cms-page .cms-team-card {
+  border: 0;
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-soft);
+}
+
+.cms-page .cms-team-card h3 {
+  color: var(--brand-blue);
+}
+
+/* ---- Closing band: solid blue, bigger type ---- */
+.cms-page .cms-cta {
+  padding-block: var(--space-8);
+}
+
+.cms-page .cms-cta .cms-section-heading h2 {
+  font-size: var(--text-3xl);
+  text-transform: uppercase;
+}
+
+.cms-page .cms-cta .public-button:first-child {
+  border-color: var(--brand-orange);
+  background: var(--brand-orange);
+  color: var(--ink);
+}
+
+.cms-hero--with-image:not(.cms-hero--home) {
+  min-height: min(58vh, 32rem);
+}
+
+.cms-hero--with-image:not(.cms-hero--home) h1 {
+  font-size: var(--text-3xl);
+}
+
+/* ---- Soft section changes: tinted sections fade in and out instead of cutting ---- */
+.cms-page .cms-section + .cms-section {
+  border-top: 0;
+}
+
+.cms-page :is(.cms-section--feature_cards, .cms-section--principles, .cms-section--stats, .cms-section--pricing) {
+  background: linear-gradient(to bottom, var(--surface) 0, var(--surface-muted) 10rem, var(--surface-muted) calc(100% - 10rem), var(--surface) 100%);
+}
+
+.cms-hero--with-image::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0;
+  height: 3.5rem;
+  background: linear-gradient(to bottom, transparent, var(--surface));
+}
+
+/* ---- Price: one full-width panel, figure on the left, note on the right ---- */
+.cms-page .cms-section--pricing .cms-editorial {
+  display: block;
+}
+
+.cms-page .cms-section--pricing .cms-section-heading {
+  margin-bottom: var(--space-6);
+}
+
+.cms-page .cms-pricing {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 24rem), 1fr));
+}
+
+.cms-page .cms-price-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: center;
+  gap: var(--space-6);
+  padding: var(--space-7);
+}
+
+.cms-page .cms-price-card__note {
+  margin-top: 0;
+  border-top: 0;
+  border-left: 1px solid var(--veil-soft);
+  padding: 0 0 0 var(--space-6);
+}
+
+@media (max-width: 767px) {
+  .cms-page .cms-price-card { grid-template-columns: 1fr; padding: var(--space-6); }
+  .cms-page .cms-price-card__note { border-left: 0; border-top: 1px solid var(--veil-soft); padding: var(--space-4) 0 0; }
+}
+
+/* ---- Closing call to action: a rounded panel on white, with the hand as a watermark ---- */
+.cms-page .cms-cta {
+  background: var(--surface);
+  padding-block: var(--space-8);
+}
+
+.cms-page .cms-cta__inner {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-xl);
+  background: linear-gradient(120deg, var(--brand-blue-deep) 0%, var(--brand-blue) 100%);
+  padding: clamp(var(--space-6), 5vw, var(--space-8));
+  box-shadow: var(--shadow-soft);
+}
+
+.cms-page .cms-cta__inner::before {
+  content: "";
+  position: absolute;
+  inset: -2rem 4% -2rem auto;
+  width: min(18rem, 40%);
+  background: url("/brand/instituto-castelao-mano-marca.webp") center / contain no-repeat;
+  filter: brightness(0) invert(1);
+  opacity: 0.1;
+  pointer-events: none;
+}
+
+.cms-page .cms-cta__inner > * {
+  position: relative;
+}
+
+/* ---- Footer: brand, one block of link groups, contact panel ---- */
+
+
+
+
+/* ---- Motion: every colour change eases; none for people who ask for less motion ---- */
+.public-site :is(a, button, .ds-card, .public-button, .cms-link-card, .cms-price-card) {
+  transition: color var(--motion-fast) ease, background-color var(--motion-fast) ease, border-color var(--motion-fast) ease, box-shadow var(--motion-fast) ease, transform var(--motion-fast) ease;
+}
+
+.cms-page .cms-link-card:hover {
+  transform: translateY(-3px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .public-site :is(a, button, .ds-card, .public-button, .cms-link-card, .cms-price-card) { transition: none; }
+  .cms-page .cms-link-card:hover { transform: none; }
+}
+
+
+
+.cms-page .cms-link-card:is(:hover, :focus-visible) .cms-link-card__action svg {
+  background: var(--brand-orange);
+  color: var(--ink);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cms-page .cms-link-cards .cms-link-card, .cms-page .cms-link-card :is(h2, h3, .cms-item__description, .cms-link-card__action, svg) { transition: none; }
+}
+
+
+
+
+
+/* ---- Principles: small white tiles so a short list still fills its section ---- */
+.cms-page .cms-principles {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+  gap: var(--space-4);
+}
+
+.cms-page .cms-principles li {
+  align-items: center;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  padding: var(--space-5);
+  transition: box-shadow var(--motion-base) var(--ease-emphasized), transform var(--motion-base) var(--ease-emphasized);
+}
+
+.cms-page .cms-principles li:hover {
+  box-shadow: var(--shadow-soft);
+  transform: translateY(-2px);
+}
+
+.cms-page .cms-principles .ds-eye {
+  margin-top: 0;
+}
+
+.cms-page .cms-principles :is(h2, h3) {
+  font-size: var(--text-lg);
+}
+
+/* ---- Team card: the role is a small pill, not a loose caption ---- */
+.cms-page .cms-team-card__body .eyebrow {
+  display: inline-block;
+  border-radius: var(--radius-pill);
+  background: var(--surface-muted);
+  padding: var(--space-1) var(--space-3);
+  color: var(--brand-blue-deep);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cms-page .cms-principles li { transition: none; }
+  .cms-page .cms-principles li:hover { transform: none; }
+}
+
+/* ---- Small screens ---- */
+
+@media (max-width: 767px) {
+  .cms-page .cms-link-card { min-height: 0; }
+}
+
+/* ---- Plain reading pages (privacy): a readable column under the shared hero ---- */
+.public-site .analytics-privacy {
+  max-width: var(--measure);
+  margin: 0;
+  padding-block: var(--space-8);
+}
+
+.public-site .analytics-privacy h2 {
+  margin: var(--space-7) 0 var(--space-3);
+  font-size: var(--text-xl);
+  color: var(--foreground);
+}
+
+.public-site .analytics-privacy p {
+  color: var(--muted-foreground);
+  font-size: var(--text-md);
+  line-height: var(--leading-body);
+}
+
+.public-site .analytics-privacy p + p {
+  margin-top: var(--space-4);
+}
+
+.public-site .analytics-privacy .public-text-link {
+  display: inline-block;
+  margin-top: var(--space-6);
+}
+
+/* ---- Gallery with one photograph: a wide picture instead of a lone thumbnail ---- */
+.cms-page .cms-gallery:has(> figure:only-child) {
+  grid-template-columns: minmax(0, 52rem);
+}
+
+.cms-page .cms-gallery > figure:only-child img {
+  aspect-ratio: 16 / 9;
+  border-radius: var(--radius-xl);
+}
+
+/* ---- Header: six menu groups and a long evaluation button must fit beside the brand ---- */
+.public-site .public-header .public-header__main { gap: 1rem; }
+.public-site .public-header .public-header__navigation > ul { gap: 1rem; }
+.public-site .public-header .public-nav-link { font-size: 0.82rem; }
+.public-site .public-header .public-header__cta { padding-inline: 1rem; }
+
+/* ---- Text blocks: introduction, split and panel (chosen by position, see textVariants) ---- */
+
+/* Introduction: a raised card, lead sentence first, the rest in two columns */
+.cms-page .cms-section--rich_text[data-variant="lead"] {
+  position: relative;
+  z-index: 2;
+  background: none;
+  padding-block: var(--space-7) var(--space-4);
+}
+
+.cms-page .cms-hero + .cms-section--rich_text[data-variant="lead"] {
+  margin-top: calc(-1 * var(--space-8));
+  padding-top: 0;
+}
+
+.cms-page [data-variant="lead"] .cms-editorial {
+  display: block;
+  max-width: none;
+  margin: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  background: var(--surface);
+  box-shadow: var(--shadow-soft);
+  padding: clamp(var(--space-6), 4vw, var(--space-8));
+}
+
+.cms-page [data-variant="lead"] .cms-prose {
+  border: 0;
+  padding: 0;
+}
+
+.cms-page [data-variant="lead"] .article-body {
+  display: grid;
+  max-width: none;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-4) var(--space-7);
+}
+
+.cms-page [data-variant="lead"] .article-body > p {
+  margin: 0;
+  color: var(--muted-foreground);
+  font-size: var(--text-base);
+  line-height: 1.8;
+}
+
+.cms-page [data-variant="lead"] .article-body > p:first-child {
+  grid-column: 1 / -1;
+  color: var(--foreground);
+  font-family: var(--font-heading);
+  font-size: var(--text-xl);
+  font-weight: 700;
+  line-height: 1.4;
+  text-wrap: balance;
+}
+
+.cms-page [data-variant="lead"] .article-body > p:nth-child(2):last-child {
+  grid-column: 1 / -1;
+  max-width: var(--measure);
+}
+
+/* Panel: tinted rounded surface, text first, title on the right, the hand as watermark */
+.cms-page .cms-section--rich_text[data-variant="panel"] .cms-editorial {
+  position: relative;
+  overflow: hidden;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+  align-items: center;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  background: linear-gradient(135deg, var(--surface-muted) 0%, var(--surface) 75%);
+  padding: clamp(var(--space-6), 5vw, var(--space-8));
+}
+
+.cms-page [data-variant="panel"] .cms-editorial::before {
+  content: "";
+  position: absolute;
+  inset: -2rem 3% -2rem auto;
+  width: min(16rem, 35%);
+  background: url("/brand/instituto-castelao-mano-marca.webp") center / contain no-repeat;
+  opacity: 0.07;
+  pointer-events: none;
+}
+
+.cms-page [data-variant="panel"] .cms-editorial > * {
+  position: relative;
+}
+
+.cms-page [data-variant="panel"] .cms-section-content {
+  order: -1;
+}
+
+.cms-page [data-variant="panel"] .cms-section-heading h2 {
+  color: var(--brand-blue-deep);
+}
+
+.cms-page [data-variant="panel"] .cms-prose {
+  border: 0;
+  padding: 0;
+}
+
+.cms-page [data-variant="panel"] .article-body {
+  color: var(--foreground);
+  font-size: var(--text-lg);
+  line-height: 1.7;
+}
+
+@media (max-width: 767px) {
+  .cms-page .cms-hero + .cms-section--rich_text[data-variant="lead"] { margin-top: calc(-1 * var(--space-6)); }
+  .cms-page [data-variant="lead"] .article-body { grid-template-columns: 1fr; }
+  .cms-page [data-variant="panel"] .cms-editorial { grid-template-columns: 1fr; }
+  .cms-page [data-variant="panel"] .cms-section-content { order: 0; }
+}
+
+/* Statement: the sentence that closes the introduction, centred and large */
+.cms-page .cms-section--rich_text[data-variant="statement"] {
+  padding-block: var(--space-6) var(--space-7);
+}
+
+.cms-page [data-variant="statement"] .cms-editorial {
+  display: block;
+  max-width: 54rem;
+  margin-inline: auto;
+}
+
+.cms-page [data-variant="statement"] .cms-prose {
+  border: 0;
+  padding: 0;
+}
+
+.cms-page [data-variant="statement"] .article-body {
+  max-width: none;
+  color: var(--brand-blue-deep);
+  font-family: var(--font-heading);
+  font-size: var(--text-xl);
+  font-weight: 700;
+  line-height: 1.45;
+  text-align: center;
+  text-wrap: balance;
+}
+
+/* Introduction with exactly two paragraphs: lead on the left, support on the right */
+.cms-page [data-variant="lead"] .article-body:has(> p:nth-child(2):last-child) {
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+  align-items: center;
+  gap: var(--space-7);
+}
+
+.cms-page [data-variant="lead"] .article-body:has(> p:nth-child(2):last-child) > p:first-child,
+.cms-page [data-variant="lead"] .article-body:has(> p:nth-child(2):last-child) > p:nth-child(2) {
+  grid-column: auto;
+  max-width: none;
+}
+
+@media (max-width: 767px) {
+  .cms-page [data-variant="lead"] .article-body:has(> p:nth-child(2):last-child) { grid-template-columns: 1fr; }
+}
+
+/* ---- Entrance motion: hero copy on load, list items one after another on scroll ---- */
+@keyframes reveal-up {
+  from { opacity: 0; transform: translate3d(0, 1.25rem, 0); }
+  to { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+
+.cms-hero__copy > * {
+  animation: hero-enter var(--motion-reveal) var(--ease-emphasized) both;
+}
+
+.cms-hero__copy > :nth-child(2) { animation-delay: var(--motion-stagger); }
+.cms-hero__copy > :nth-child(3) { animation-delay: calc(var(--motion-stagger) * 2); }
+.cms-hero__copy > :nth-child(4) { animation-delay: calc(var(--motion-stagger) * 3); }
+.cms-hero__copy > :nth-child(n + 5) { animation-delay: calc(var(--motion-stagger) * 4); }
+
+[data-reveal-group="ready"] > * {
+  opacity: 0;
+}
+
+[data-reveal-group="visible"] > * {
+  animation: reveal-up var(--motion-reveal) var(--ease-emphasized) backwards;
+  animation-delay: calc(var(--reveal-index, 0) * var(--motion-stagger));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cms-hero__copy > *,
+  [data-reveal-group="visible"] > * { animation: none; }
+  [data-reveal-group="ready"] > * { opacity: 1; }
+}
+
+/* ---- Closing call to action: title and buttons centred ---- */
+.cms-page .cms-cta__inner {
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--space-6);
+  text-align: center;
+}
+
+.cms-page .cms-cta .cms-section-heading {
+  max-width: 44rem;
+  margin-inline: auto;
+}
+
+.cms-page .cms-cta .cms-section-heading h2 {
+  margin-inline: auto;
+}
+
+.cms-page .cms-cta__actions {
+  justify-content: center;
+}

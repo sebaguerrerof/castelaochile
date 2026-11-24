@@ -1,0 +1,130 @@
+/*
+ * Minimal footer on the corporate blue. The logo is the manual's negative version
+ * ("sobre fondo azul corporativo", p. 16). Every value comes from tokens.css.
+ */
+.public-footer {
+  background: linear-gradient(180deg, var(--brand-blue-deep) 0%, color-mix(in srgb, var(--brand-blue-deep) 78%, var(--ink)) 100%);
+  color: var(--primary-foreground);
+}
+
+.public-footer a {
+  color: var(--primary-foreground);
+  text-decoration: none;
+}
+
+.public-footer a:hover {
+  text-decoration: underline;
+  text-underline-offset: 0.3em;
+}
+
+.public-footer__inner {
+  display: grid;
+  gap: var(--space-7);
+  padding-block: var(--space-8) var(--space-6);
+}
+
+.public-footer__top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-6);
+}
+
+.public-footer .brand-logo__asset {
+  width: min(11rem, 100%);
+  height: auto;
+}
+
+.public-footer__contact {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-4) var(--space-6);
+}
+
+.public-footer__channel {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  border-radius: var(--radius-pill);
+  background: var(--brand-orange);
+  padding: var(--space-3) var(--space-5);
+  font-size: var(--text-sm);
+  font-weight: 700;
+}
+
+.public-footer .public-footer__channel {
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.public-footer .public-footer__channel:hover {
+  background: var(--primary-foreground);
+}
+
+.public-footer .public-footer__channel svg {
+  width: 1.25rem;
+  height: 1.25rem;
+  flex-shrink: 0;
+}
+
+.public-footer__mail {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-sm);
+}
+
+.public-footer__nav {
+  border-top: 1px solid color-mix(in srgb, var(--primary-foreground) 18%, transparent);
+  padding-top: var(--space-5);
+}
+
+.public-footer__nav ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3) var(--space-6);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.public-footer__nav a {
+  font-size: var(--text-sm);
+  font-weight: 700;
+}
+
+.public-footer__bottom {
+  border-top: 1px solid color-mix(in srgb, var(--primary-foreground) 18%, transparent);
+  padding-block: var(--space-4);
+  color: var(--on-dark-soft);
+  font-size: var(--text-xs);
+}
+
+.public-footer__bottom-inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2) var(--space-6);
+}
+
+.public-footer__bottom p {
+  margin: 0;
+}
+
+.public-footer__notice {
+  flex: 1;
+  max-width: 56ch;
+}
+
+@media (max-width: 575px) {
+  .public-footer__inner { padding-block: var(--space-7) var(--space-5); }
+  .public-footer__bottom-inner { padding-right: 4rem; }
+}
+
+@media (max-width: 575px) {
+  .public-footer__bottom-inner { flex-direction: column; align-items: flex-start; gap: var(--space-3); }
+  .public-footer__notice { flex: none; max-width: none; }
+}

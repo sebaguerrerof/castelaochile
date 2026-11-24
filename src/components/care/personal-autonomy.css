@@ -1,0 +1,35 @@
+.pa-workspace { min-width: 0; }
+.pa-workspace > *, .pa-workspace .admin-panel { min-width: 0; max-width: 100%; }
+.pa-workspace .admin-button { max-width: 100%; white-space: normal; overflow-wrap: anywhere; display: inline-flex; align-items: center; justify-content: center; text-align: center; }
+.care-patient-workspace.pa-workspace .admin-panel { border: 1px solid var(--library-border, #dbe2df); border-radius: 1rem; padding: clamp(1rem, 3vw, 1.75rem); background: var(--surface); }
+.care-patient-workspace.pa-workspace .admin-page-header h1 { font-size: clamp(1.8rem, 4vw, 2.5rem); line-height: 1.15; }
+.care-patient-workspace.pa-workspace .admin-page-header { margin-block: 1rem; }
+.pa-workspace section[id], .pa-source { scroll-margin-top: 6rem; }
+.pa-workspace .care-note { white-space: pre-line; }
+.pa-workspace .care-field, .pa-workspace fieldset { min-width: 0; }
+.pa-workspace input:not([type=checkbox]), .pa-workspace select, .pa-workspace textarea { width: 100%; max-width: 100%; box-sizing: border-box; }
+.pa-workspace .care-field { display: grid; gap: .5rem; margin-block: 1rem; }
+.pa-workspace label, .pa-workspace p, .pa-workspace th, .pa-workspace td { overflow-wrap: anywhere; }
+.pa-workspace .care-check { display: flex; gap: .65rem; align-items: flex-start; margin-block: 1rem; }
+.pa-workspace .care-check input { flex: 0 0 auto; margin-top: .25rem; }
+.pa-workspace fieldset { border: 0; padding: 0; }
+.pa-wizard progress { width: 100%; height: .6rem; accent-color: var(--brand-primary, #17665d); }
+.pa-item { padding-block: 1rem; border-bottom: 1px solid var(--border, #dbe2df); }
+.pa-item h3 { font-size: 1rem; }
+.pa-workspace details { margin-block: .8rem; }
+.pa-workspace summary { cursor: pointer; padding: .8rem .2rem; font-weight: 650; }
+.pa-step-controls { display: flex; flex-wrap: wrap; gap: .6rem; padding-block: 1rem; }
+.pa-workspace button, .pa-workspace select, .pa-workspace input:not([type=checkbox]), .pa-workspace summary { min-height: 44px; }
+.pa-agreement { border: 1px solid var(--border, #dbe2df); border-radius: 1rem; padding: clamp(.8rem, 2vw, 1.5rem); margin-block: 1.2rem; }
+.pa-table-wrap { overflow-x: auto; max-width: 100%; margin-block: 1rem; }
+.pa-matrix { border-collapse: collapse; width: 100%; font-size: .88rem; }
+.pa-matrix th, .pa-matrix td { border: 1px solid var(--border, #dbe2df); padding: .8rem; text-align: left; min-width: 12rem; vertical-align: top; }
+.pa-matrix th[scope=row] { min-width: 16rem; }
+.pa-matrix td[data-missing=true] { background: #f1f3f3; color: #475750; }
+.pa-dots { display: flex; gap: .35rem; margin-bottom: .4rem; }
+.pa-dots span { width: .7rem; height: .7rem; border: 1px solid currentColor; border-radius: 50%; }
+.pa-dots span[data-selected=true] { background: currentColor; box-shadow: 0 0 0 2px #fff, 0 0 0 3px currentColor; }
+.pa-result { display: grid; gap: .4rem; margin-block: 1rem; }
+.pa-result-bar { height: .5rem; background: var(--brand-primary, #17665d); border-radius: .3rem; }
+.pa-form textarea, .pa-form input, .pa-form select { font: inherit; }
+@media (max-width: 600px) { .pa-step-controls > button { flex: 1 1 100%; } .pa-workspace .admin-panel { padding: 1rem; } }

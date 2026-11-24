@@ -1,0 +1,71 @@
+.care-form fieldset { display: grid; gap: 1rem; min-width: 0; border: 0; padding: 0; margin: 0; }
+.care-form-fields { display: grid; gap: 1rem; }
+.care-form .care-participant-options { display: flex; flex-direction: column; }
+.care-participant-options legend { width: 100%; min-width: 0; max-width: 100%; margin-bottom: .6rem; font-weight: 700; white-space: normal; overflow-wrap: anywhere; }
+.care-patient-workspace { display: grid; gap: 1rem; }
+.care-workspace { --admin-muted: var(--ink-soft); }
+.care-patient-workspace .library-panel { margin: 0; }
+.care-patient-workspace .library-panel h2 { margin-top: 0; }
+.care-patient-workspace input, .care-patient-workspace select, .care-patient-workspace textarea { border: 1px solid var(--library-border); border-radius: .5rem; padding: .65rem .8rem; background: var(--surface); color: var(--foreground); font: inherit; width: 100%; min-width: 0; }
+.care-patient-workspace .admin-button { border: 0; border-radius: .5rem; background: var(--primary); color: var(--primary-foreground); font: inherit; font-weight: 700; cursor: pointer; padding: .75rem 1rem; min-height: 44px; }
+.care-patient-workspace .care-check input { width: 1.2rem; }
+.care-patient-workspace .admin-notice { color: var(--success); }
+.care-patient-workspace .admin-form-error { color: #9b2525; }
+.care-patient-workspace summary { cursor: pointer; font-weight: 700; padding: .6rem 0; }
+.care-card>div { min-width: 0; width: 100%; }
+.care-card h3, .care-card h2, .care-card p { overflow-wrap: anywhere; }
+.care-card .care-form { margin-top: .8rem; }
+@media (max-width: 640px) { .patient-sidebar nav:has(a[href="/pacientes/hoy"]) { grid-template-columns: repeat(4,minmax(0,1fr)); } }
+.care-form .care-options { border: 1px solid var(--border); border-radius: .5rem; padding: .8rem; }
+.care-options legend { font-weight: 700; }
+.care-patient-workspace dd,.care-workspace dd { margin: .3rem 0 1rem; white-space: pre-wrap; overflow-wrap: anywhere; }
+.care-workspace .admin-panel-header { display: block; }
+.care-workspace .admin-panel { margin-bottom: 1.25rem; }
+.care-workspace [id^="revision-"] { scroll-margin-top: 6rem; }
+.care-workspace summary { cursor: pointer; font-weight: 700; width: 100%; }
+.care-workspace details[open] summary { margin-bottom: 1rem; }
+.care-form fieldset:disabled { opacity: .65; }
+.care-workspace .care-form textarea { min-height: 5rem; resize: vertical; }
+.care-workspace .care-form input:not([type=checkbox]):not([type=hidden]), .care-workspace .care-form select, .care-workspace .care-form button, .care-search button { min-height: 44px; }
+.care-workspace .admin-button { min-height: 44px; }
+.care-form .care-check { min-height: 44px; }
+.care-patient-workspace .admin-button-secondary { border: 1px solid var(--library-blue); background: var(--surface); color: #00649d; }
+.care-form label { display: grid; gap: .4rem; }
+.care-field { display: grid; grid-template-columns: minmax(0,1fr); min-width: 0; gap: .4rem; }
+.care-form input, .care-form select, .care-form textarea { width: 100%; min-width: 0; }
+.care-form select { max-width: 100%; overflow: hidden; text-overflow: ellipsis; appearance: none; padding-right: 2.25rem; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23183044' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right .7rem center; background-size: 1rem; }
+.care-form input[type=datetime-local] { max-width: 100%; appearance: none; }
+.care-form input[type=checkbox] { width: 1.2rem; height: 1.2rem; flex: 0 0 auto; }
+.care-form .care-check { display: flex; align-items: center; gap: .65rem; font-weight: 400; }
+.care-grid { display: grid; gap: 1.25rem; grid-template-columns: repeat(2,minmax(0,1fr)); }
+.care-cards { display: grid; gap: 1rem; }
+.care-card { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); padding: 1.2rem; min-width: 0; }
+.care-card h2, .care-card h3 { margin: 0 0 .4rem; font-size: 1.15rem; }
+.care-card p { margin: .3rem 0; }
+.care-card a { font-weight: 700; }
+.care-nav { display: flex; flex-wrap: wrap; gap: .75rem; margin: 0 0 1.5rem; }
+.care-nav a { border: 1px solid var(--border); border-radius: var(--radius); padding: .6rem .9rem; }
+.care-nav a[aria-current=page] { background: var(--primary); color: var(--primary-foreground); }
+.care-nav-current { border: 1px solid var(--primary); border-radius: var(--radius); padding: .6rem .9rem; background: var(--primary); color: var(--primary-foreground); }
+.care-subtle { color: var(--admin-muted,var(--muted-foreground)); font-size: .9rem; }
+.care-history { display: grid; gap: .8rem; list-style: none; margin: 0; padding: 0; }
+.care-history li { border-left: 3px solid var(--primary); padding: .4rem 1rem; }
+.care-history p { margin: .3rem 0; overflow-wrap: anywhere; }
+.care-search { display: flex; flex-wrap: wrap; gap: .75rem; align-items: end; margin-bottom: 1.5rem; }
+.care-search label { display: grid; gap: .4rem; flex: 1 1 12rem; }
+.care-workspace .care-search input { border: 1px solid var(--border); border-radius: .5rem; background: var(--surface); color: var(--foreground); font: inherit; padding: .65rem .8rem; min-width: 0; }
+.care-badge { display: inline-block; border-radius: var(--radius); background: var(--muted); padding: .3rem .55rem; font-size: .85rem; }
+.care-field p { color: var(--destructive,#9b2525); }
+.care-form :focus-visible, .care-nav :focus-visible, .care-card :focus-visible { outline: 3px solid var(--primary); outline-offset: 3px; }
+@media (max-width: 767px) { .care-grid { grid-template-columns: minmax(0,1fr); } .care-card { padding: 1rem; } }
+@media (max-width: 767px) { .care-workspace .care-form input, .care-workspace .care-form select, .care-workspace .care-form textarea { font-size: 16px; } }
+@media (prefers-reduced-motion: reduce) { .care-form *, .care-card * { transition: none; } }
+
+/* Bound native Safari controls to the institutional Recovery filters. */
+.care-recovery-filters label { min-width: 0; }
+.care-recovery-reference { overflow-wrap: anywhere; }
+.care-recovery-filters input, .care-recovery-filters select { width: 100%; min-width: 0; max-width: 100%; min-height: 44px; font-size: 16px; appearance: none; }
+
+.care-table-scroll { max-width: 100%; min-width: 0; overflow-x: auto; margin: 1rem 0; }
+.care-table-scroll:focus-visible { outline: 3px solid var(--primary); outline-offset: 3px; }
+.care-table-scroll table { min-width: 48rem; }

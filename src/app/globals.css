@@ -1,4 +1,6 @@
 @import "tailwindcss";
+@import "../styles/tokens.css";
+@import "../styles/components.css";
 
 @theme inline {
   --color-background: var(--background);
@@ -25,77 +27,6 @@
   --radius-md: calc(var(--radius) - 0.125rem);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 0.5rem);
-}
-
-:root {
-  /* Official primitives — Manual pp. 9–11. */
-  --brand-blue: #0079be;
-  --brand-orange: #da8a1b;
-  --brand-gray: #868685;
-
-  /* Derived UI tones — not additional corporate colours. */
-  --brand-blue-deep: #005c90;
-  --brand-blue-bright: #008dcc;
-  --ink: #183044;
-  --ink-soft: #526574;
-  --mist: #edf6fa;
-  --line: #c7dbe6;
-  --canvas: #f3f7f9;
-
-  --background: #ffffff;
-  --foreground: var(--ink);
-  --surface: #ffffff;
-  --surface-muted: var(--mist);
-  --primary: var(--brand-blue);
-  --primary-foreground: #ffffff;
-  --secondary: #e6f3f9;
-  --secondary-foreground: #075a8d;
-  --accent: var(--brand-orange);
-  --accent-foreground: #2d1a05;
-  --border: var(--line);
-  --muted: var(--canvas);
-  --muted-foreground: var(--ink-soft);
-  --ring: var(--brand-blue);
-  --destructive: #b42318;
-  --success: #0d6840;
-  --success-surface: #e7f5ed;
-  --whatsapp: #25d366;
-  --whatsapp-hover: color-mix(in srgb, var(--whatsapp) 84%, black);
-
-  --font-nav: Arial, Helvetica, sans-serif;
-  --font-body: Arial, Helvetica, sans-serif;
-  --font-heading: var(--font-pt-sans), Arial, Helvetica, sans-serif;
-  --font-quote: var(--font-volkhov), Georgia, serif;
-  --font-gallery: "Droid Serif", Georgia, serif;
-
-  --content-max: 80rem;
-  --section-space: 4.5rem;
-  --radius: 0.75rem;
-  --radius-xl: 1.25rem;
-  --shadow-primary: 0 12px 28px rgb(0 121 190 / 18%);
-  --shadow-soft: 0 18px 46px rgb(24 48 68 / 10%);
-  --shadow-image: 0 26px 55px rgb(24 48 68 / 18%);
-  --motion-fast: 180ms;
-  --motion-menu: 220ms;
-  --motion-page: 280ms;
-  --motion-reveal: 560ms;
-  --motion-stagger: 80ms;
-  --motion-distance: 0.875rem;
-  --motion-base: 380ms;
-  --motion-slow: 680ms;
-  --ease-emphasized: cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-@media (min-width: 640px) {
-  :root {
-    --section-space: 5.5rem;
-  }
-}
-
-@media (min-width: 1024px) {
-  :root {
-    --section-space: 7rem;
-  }
 }
 
 * {
@@ -201,7 +132,7 @@ body {
 
 .brand-logo__asset {
   display: block;
-  width: 11.875rem;
+  width: 10.25rem;
   height: auto;
 }
 
@@ -217,15 +148,8 @@ body {
   text-transform: uppercase;
 }
 
-.brand-logo--footer {
-  border-radius: 0.55rem;
-  background: var(--surface);
-  box-shadow: 0 10px 22px rgb(0 0 0 / 12%);
-  padding: 0.55rem 0.75rem;
-}
-
-.brand-logo--footer .brand-logo__asset {
-  width: 12.5rem;
+.brand-logo--vertical .brand-logo__asset {
+  width: min(22rem, 100%);
 }
 
 .hero-scene {
@@ -821,11 +745,11 @@ body {
 
 @media (min-width: 640px) {
   .brand-logo__asset {
-    width: 14.75rem;
+    width: 12.5rem;
   }
 
-  .brand-logo--footer .brand-logo__asset {
-    width: 13.5rem;
+  .brand-logo--vertical .brand-logo__asset {
+    width: 22rem;
   }
 
   .contact-scene__content {

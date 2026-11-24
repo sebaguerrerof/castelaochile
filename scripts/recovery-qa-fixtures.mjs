@@ -1,0 +1,2 @@
+// Neutral fixtures only; these values are never imported by the product.
+export const recoveryActivityFixture={activity_type:'individual',recovery_participation:'full',participation_reason:'',support:'occasional',support_details:'Apoyo ocasional observado neutral QA',facts:'Tarea neutral observada QA',progress:'Avance neutral observado QA',difficulties:'Sin dificultades observables en esta actividad neutral QA',evidence_source:'observed',evidence:'Observación directa neutral QA',no_commitment_reason:'No se acordó una nueva tarea en esta actividad neutral QA'};

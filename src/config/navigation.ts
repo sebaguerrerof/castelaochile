@@ -2,7 +2,7 @@ import type { NavigationItem } from "../types/site.ts";
 
 export const navigationItems: readonly NavigationItem[] = [
   { href: "/", label: "Inicio" },
-  { href: "/instituto", label: "Instituto" },
+  { href: "/blog", label: "Blog" },
   { href: "/acompanamiento", label: "Acompañamiento" },
   { href: "/nuestro-enfoque", label: "Nuestro enfoque" },
   { href: "/familias", label: "Familias" },

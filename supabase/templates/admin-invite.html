@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Invitación al panel de administración</title>
+  </head>
+  <body style="margin:0; padding:0; background-color:#edf6fa; color:#183044; font-family:Arial, Helvetica, sans-serif;">
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color:#edf6fa; margin:0; padding:32px 16px; width:100%;">
+      <tr>
+        <td align="center">
+          <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color:#ffffff; border:1px solid #c7dbe6; border-radius:16px; max-width:600px; overflow:hidden; width:100%;">
+            <tr>
+              <td style="background-color:#005c90; border-bottom:5px solid #da8a1b; padding:28px 36px;">
+                <p style="color:#ffffff; font-size:23px; font-weight:700; letter-spacing:-0.3px; line-height:1.2; margin:0;">Instituto Castelao</p>
+                <p style="color:#d9f0fb; font-size:11px; font-weight:700; letter-spacing:1.6px; line-height:1.4; margin:8px 0 0; text-transform:uppercase;">Chile · Administración</p>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:36px;">
+                <p style="color:#0079be; font-size:12px; font-weight:700; letter-spacing:1.2px; line-height:1.4; margin:0 0 12px; text-transform:uppercase;">Acceso seguro</p>
+                <h1 style="color:#183044; font-size:28px; line-height:1.2; margin:0 0 18px;">Te invitamos al panel de administración</h1>
+                <p style="color:#526574; font-size:16px; line-height:1.6; margin:0 0 24px;">Recibiste una invitación para crear tu acceso al panel privado de Instituto Castelao Chile.</p>
+                <table role="presentation" cellspacing="0" cellpadding="0" border="0" style="margin:0 0 26px;">
+                  <tr>
+                    <td align="center" bgcolor="#0079be" style="border-radius:7px;">
+                      <a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&amp;type=invite" style="background-color:#0079be; border:1px solid #0079be; border-radius:7px; color:#ffffff; display:inline-block; font-size:16px; font-weight:700; line-height:1; padding:15px 22px; text-decoration:none;">Activar mi acceso</a>
+                    </td>
+                  </tr>
+                </table>
+                <p style="border-top:1px solid #c7dbe6; color:#526574; font-size:13px; line-height:1.55; margin:0; padding-top:20px;">Por seguridad, este enlace es personal, de un solo uso y expira pronto. Si no esperabas esta invitación, puedes ignorar este correo.</p>
+              </td>
+            </tr>
+            <tr>
+              <td style="background-color:#f3f7f9; border-top:1px solid #c7dbe6; padding:20px 36px;">
+                <p style="color:#526574; font-size:12px; line-height:1.5; margin:0;">Instituto Castelao Chile · Mensaje transaccional de acceso</p>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

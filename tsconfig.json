@@ -34,7 +34,23 @@
     "src/**/*.ts",
     "src/**/*.tsx",
     ".next/types/**/*.ts",
-    ".next/dev/types/**/*.ts"
+    ".next/dev/types/**/*.ts",
+    ".next-care/types/**/*.ts",
+    ".next-care/dev/types/**/*.ts",
+    ".next-patient-e2e/types/**/*.ts",
+    ".next-patient-e2e/dev/types/**/*.ts",
+    ".next-pa-qa/types/**/*.ts",
+    ".next-pa-qa/dev/types/**/*.ts",
+    ".next-cms-editorial/types/**/*.ts",
+    ".next-cms-editorial/dev/types/**/*.ts",
+    ".next-cms-editorial-final/types/**/*.ts",
+    ".next-cms-editorial-final/dev/types/**/*.ts",
+    ".next-cms-editorial-check/types/**/*.ts",
+    ".next-cms-editorial-check/dev/types/**/*.ts",
+    ".next-cms-readability-dev/types/**/*.ts",
+    ".next-cms-readability-dev/dev/types/**/*.ts",
+    ".next-cms-readability-webpack/types/**/*.ts",
+    ".next-cms-readability-webpack/dev/types/**/*.ts"
   ],
   "exclude": [
     "node_modules"
