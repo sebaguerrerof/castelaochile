@@ -1,0 +1,117 @@
+begin;
+create function pg_temp.care_assert(v boolean,label text) returns text language plpgsql as $$begin if v is distinct from true then raise exception 'FAIL: %',label;end if;return label;end $$;
+create function pg_temp.care_denied(stmt text,label text,expected text default '42501') returns text language plpgsql as $$begin begin execute stmt;exception when others then if sqlstate<>expected then raise exception 'Wrong error % for %: %',sqlstate,label,sqlerrm;end if;return label;end;raise exception 'Unexpected success: %',label;end $$;
+create function pg_temp.id(kind integer,n integer) returns uuid language sql as $$select ('c'||kind||'000000-0000-4000-8000-'||lpad(n::text,12,'0'))::uuid$$;
+create function pg_temp.assess(color text default 'green',version bigint default 0) returns jsonb language sql as $$select jsonb_build_object('patient_id',pg_temp.id(2,1),'version',version,'color',color,'occurred_at',now()-interval '1 hour','review_at',now()+interval '2 days','reason','Valoración neutral QA','record_id',pg_temp.id(4,1),'confirm_approved',true)$$;
+insert into auth.users(id,email) select pg_temp.id(1,n),'dashboard-fixture-'||n||'@example.test' from generate_series(1,6)n;
+insert into public.admin_users(user_id,role,is_active) select pg_temp.id(1,n),(case when n=6 then 'editor' else 'viewer' end)::public.admin_role,true from generate_series(3,6)n;
+insert into public.patient_profiles(id,auth_user_id,email,display_name) select pg_temp.id(2,n),pg_temp.id(1,n),'dashboard-fixture-'||n||'@example.test','Persona dashboard QA '||n from generate_series(1,2)n;
+insert into public.care_staff_capabilities(user_id,capabilities) select pg_temp.id(1,n),array['care.directory.read','care.patient.read','care.records.read','care.records.create']||case when n=5 then array['care.alerts.review','care.decisions.manage'] else array[]::text[] end from generate_series(3,5)n;
+insert into public.care_assignments(patient_id,professional_id,specialty,starts_at,created_by) values
+ (pg_temp.id(2,1),pg_temp.id(1,3),'psychology',now()-interval '20 days',pg_temp.id(1,5)),
+ (pg_temp.id(2,1),pg_temp.id(1,5),'direction',now()-interval '20 days',pg_temp.id(1,5)),
+ (pg_temp.id(2,1),pg_temp.id(1,5),'psychology',now()-interval '20 days',pg_temp.id(1,5)),
+ (pg_temp.id(2,2),pg_temp.id(1,4),'psychology',now()-interval '20 days',pg_temp.id(1,5)),
+ (pg_temp.id(2,2),pg_temp.id(1,5),'direction',now()-interval '20 days',pg_temp.id(1,5));
+insert into public.care_episodes(id,patient_id,started_at,status,created_by) select pg_temp.id(5,n),pg_temp.id(2,n),now()-interval '20 days','active',pg_temp.id(1,5) from generate_series(1,2)n;
+insert into public.care_episode_history(episode_id,status,effective_at,actor_id,reason,version) select pg_temp.id(5,n),'active',now()-interval '20 days',pg_temp.id(1,5),'Historia neutral QA',1 from generate_series(1,2)n;
+insert into public.care_events(id,title,kind,starts_at,ends_at,professional_id,modality,status,closed_at,created_by)
+ select pg_temp.id(3,n),'Actividad QA '||n,'individual',now()-interval '2 hours',now()-interval '1 hour',pg_temp.id(1,case when n=5 then 4 else 3 end),'in_person',case when n=6 then 'cancelled' when n=7 then 'scheduled' else 'completed' end,case when n=7 then null else now()-interval '30 minutes' end,pg_temp.id(1,5) from generate_series(1,7)n;
+insert into public.care_event_participants(event_id,patient_id,attendance) select pg_temp.id(3,n),pg_temp.id(2,case when n=5 then 2 else 1 end),case n when 2 then 'absent' when 3 then 'justified' when 4 then 'pending' else 'present' end from generate_series(1,7)n;
+insert into public.care_session_records(id,patient_id,event_id,author_id,specialty,occurred_at,status,revision,first_finalized_at) values
+ (pg_temp.id(4,1),pg_temp.id(2,1),pg_temp.id(3,1),pg_temp.id(1,3),'psychology',now()-interval '2 hours','final',1,now()-interval '20 minutes'),
+ (pg_temp.id(4,2),pg_temp.id(2,1),pg_temp.id(3,2),pg_temp.id(1,3),'psychology',now()-interval '2 hours','draft',0,null);
+insert into public.care_report_rules(id,kind,effective_on,opens_local,closes_local,close_next_day,basis,weekdays,fields,required_fields,approved_by,reason) values
+ (pg_temp.id(6,1),'morning',(now() at time zone 'America/Santiago')::date-20,'08:00','10:00',false,'active_days',array[1,2,3,4,5,6,7],array['state'],array['state'],pg_temp.id(1,5),'Regla QA');
+insert into public.care_report_obligations(id,patient_id,local_day,kind,rule_id,opens_at,closes_at,fields,required_fields,required,requirement_reason,generated_at,closed_at)
+ select pg_temp.id(7,n),pg_temp.id(2,1),(now() at time zone 'America/Santiago')::date-n,'morning',pg_temp.id(6,1),now()-n*interval '1 day'-interval '2 hours',now()-n*interval '1 day',array['state'],array['state'],n<>4,'Obligación QA',now()-n*interval '1 day'-interval '1 hour',null from generate_series(1,4)n;
+insert into public.care_daily_reports(id,patient_id,author_id,answers,first_submitted_at) select pg_temp.id(7,n),pg_temp.id(2,1),pg_temp.id(1,1),'{"state":"Autorreporte neutral QA"}',now()-n*interval '1 day'+case when n=1 then interval '0' else interval '1 minute' end from generate_series(1,2)n;
+insert into public.care_commitments(id,patient_id,title,due_at,responsible_kind,visibility,origin,created_by) values(pg_temp.id(8,1),pg_temp.id(2,1),'Compromiso QA',now()-interval '1 day','patient','coordination','professional',pg_temp.id(1,3));
+set local role anon;
+select pg_temp.care_denied($$select public.care_dashboard()$$,'Anon no dashboard');
+select pg_temp.care_denied($$select * from public.care_alerts$$,'Anon no alerts');
+reset role;set local role authenticated;select set_config('request.jwt.claim.sub',pg_temp.id(1,6)::text,true);
+select pg_temp.care_denied($$select public.care_dashboard()$$,'CMS editor no clinical aggregation');
+select pg_temp.care_assert((select count(*)=0 from public.care_followup_reviews),'CMS editor no clinical review rows');
+select set_config('request.jwt.claim.sub',pg_temp.id(1,1)::text,true);
+select pg_temp.care_denied($$select public.care_dashboard()$$,'Patient no internal dashboard');
+select pg_temp.care_denied($$select public.care_followup_read(pg_temp.id(2,1))$$,'Patient no own internal review');
+select pg_temp.care_assert((select count(*)=0 from public.care_alerts),'Patient no own internal alert metadata');
+select set_config('request.jwt.claim.sub',pg_temp.id(1,3)::text,true);
+select pg_temp.care_assert(public.care_dashboard()->'attendance'='{"present":1,"absent":1,"justified":1,"pending":1,"total":4}'::jsonb,'Four attendance states; cancelled/scheduled excluded');
+select pg_temp.care_assert(public.care_dashboard()->'reports'='{"on_time":1,"late":1,"omitted":1,"total":3}'::jsonb,'Closed required reports; exact deadline on time; exempt excluded');
+select pg_temp.care_assert((public.care_dashboard()->>'pending_records')::int=3,'Expected records derive from sessions; drafts remain pending');
+select pg_temp.care_assert((public.care_dashboard()->>'active')::int=1 and (public.care_dashboard()->>'scoped_total')::int=1,'Assignment stock scoped to one distinct patient');
+select pg_temp.care_assert((public.care_dashboard_patients()->'patients'->0->>'color')='gray','Operational alerts do not assign a clinical color');
+select pg_temp.care_assert((public.care_dashboard()->>'alerts')::int=2,'One omitted obligation and one overdue commitment create alerts');
+select pg_temp.care_assert(public.care_dashboard_sync()=0 and (public.care_dashboard_alerts(1,'pending')->>'total')::int=2,'Alert source uniqueness across repeated reads');
+select pg_temp.care_assert((public.care_dashboard_sources('attendance',30,'present')->>'total')::int=1,'Graph drilldown exact present source');
+select pg_temp.care_assert((public.care_dashboard_sources('reports',30,'omitted')->>'total')::int=1,'Graph drilldown exact omitted source');
+select pg_temp.care_assert((public.care_dashboard_sources('records',30)->>'total')::int=3,'Pending card matches sources');
+select pg_temp.care_assert((public.care_dashboard_sources('attendance',30,'absent')->'rows'->0->>'patient_id')=pg_temp.id(2,1)::text,'No out-of-scope source metadata');
+select pg_temp.care_assert((public.care_dashboard_patients('%')->>'total')::int=0,'Literal search does not treat percent as wildcard');
+select pg_temp.care_denied($$select public.care_followup_manage('assessment',pg_temp.assess())$$,'Assessment needs explicit review capability');
+select pg_temp.care_denied($$select * from private.care_followup_notes$$,'No direct review body privilege');
+select pg_temp.care_denied($$update public.care_alerts set state='resolved'$$,'No direct alert writes');
+select set_config('request.jwt.claim.sub',pg_temp.id(1,4)::text,true);
+select pg_temp.care_assert((public.care_dashboard()->'attendance'->>'total')::int=1 and (public.care_dashboard()->>'alerts')::int=0,'Other professional sees only B');
+select pg_temp.care_denied($$select public.care_followup_read(pg_temp.id(2,1))$$,'Other professional no A review history');
+select set_config('request.jwt.claim.sub',pg_temp.id(1,5)::text,true);
+select pg_temp.care_assert((public.care_dashboard()->'attendance'->>'present')::int=2 and (public.care_dashboard()->'attendance'->>'total')::int=5,'Collective ratio uses 2/5, not mean of individual percentages');
+select pg_temp.care_assert((public.care_dashboard()->>'scoped_total')::int=2 and (public.care_dashboard()->>'active')::int=2,'Multiple specialty assignments do not duplicate patients');
+select pg_temp.care_denied($$select public.care_followup_manage('assessment',pg_temp.assess()||'{"confirm_approved":false}')$$,'Manual assessment requires explicit confirmation','P0001');
+select pg_temp.care_denied($$select public.care_followup_manage('assessment',pg_temp.assess()||jsonb_build_object('review_at',now()-interval '1 minute'))$$,'No expired review on new assessment','P0001');
+select pg_temp.care_denied($$select public.care_followup_manage('assessment',pg_temp.assess()||jsonb_build_object('record_id',pg_temp.id(4,2)))$$,'Draft not valid assessment evidence','P0001');
+select pg_temp.care_denied($$select public.care_followup_manage('assessment',pg_temp.assess()||jsonb_build_object('patient_id',pg_temp.id(2,2)))$$,'Evidence must belong to same patient','P0001');
+select public.care_followup_manage('assessment',pg_temp.assess());
+select pg_temp.care_assert(public.care_dashboard_patients()->'patients' @> '[{"color":"green"}]','Green requires manual review with evidence');
+select pg_temp.care_assert(public.care_followup_read(pg_temp.id(2,1))->'reviews'->0->>'reason'='Valoración neutral QA','Authorized manual review persists reason and evidence');
+select pg_temp.care_denied($$select public.care_followup_manage('assessment',pg_temp.assess())$$,'Concurrent stale review rejected','40001');
+select public.care_followup_manage('assessment',pg_temp.assess('red',(select max(revision) from public.care_followup_reviews)));
+select pg_temp.care_assert(jsonb_array_length(public.care_followup_read(pg_temp.id(2,1))->'reviews')=2,'New manual assessment preserves previous version');
+reset role;update public.care_session_records set revision=2 where id=pg_temp.id(4,1);
+set local role authenticated;select set_config('request.jwt.claim.sub',pg_temp.id(1,5)::text,true);
+select pg_temp.care_assert(public.care_followup_read(pg_temp.id(2,1))->'reviews'->0->>'record_revision'='1','Assessment evidence revision remains original after source amendment');
+reset role;update public.care_followup_reviews set review_at=now()-interval '30 minutes' where color='red';
+set local role authenticated;select set_config('request.jwt.claim.sub',pg_temp.id(1,5)::text,true);
+select pg_temp.care_assert(public.care_dashboard_patients('',1,'red')->'patients'->0->>'color'='red','Expired red remains visible for review');
+select public.care_followup_manage('receive',(select jsonb_build_object('id',id,'version',version,'reason','Recepción QA') from public.care_alerts order by id limit 1));
+select pg_temp.care_assert((public.care_dashboard_alerts(1,'received')->>'total')::int=1,'Reception visible in filtered list');
+select pg_temp.care_denied($$select public.care_followup_manage('resolve',(select jsonb_build_object('id',id,'version',1,'reason','Cierre QA') from public.care_alerts where state='received'))$$,'Stale alert version rejected','40001');
+select public.care_followup_manage('resolve',(select jsonb_build_object('id',id,'version',version,'reason','Cierre QA') from public.care_alerts where state='received'));
+select pg_temp.care_assert((public.care_dashboard()->>'alerts')::int=1 and public.care_dashboard_sync()=0,'Resolved alert retained and never recreated');
+select pg_temp.care_assert(jsonb_array_length(public.care_followup_read(pg_temp.id(2,1))->'alerts')=2,'History preserves resolved alert');
+select pg_temp.care_assert((public.care_dashboard_alerts(1,'resolved')->>'total')::int=1,'Resolved listing exact');
+select pg_temp.care_assert(public.care_dashboard_alerts(1,'pending')->'last_action'->>'state'='resolved','Persisted confirmation remains when resolved row leaves filter');
+select pg_temp.care_denied($$select public.care_dashboard(14)$$,'Reject unsupported period','P0001');
+select pg_temp.care_denied($$select public.care_dashboard_sources('attendance',30,'',0)$$,'Reject invalid page','P0001');
+select pg_temp.care_assert(private.care_dashboard_start(7,'2026-09-08 12:00:00+00')='2026-09-02 04:00:00+00'::timestamptz,'Period uses civil midnight across spring DST');
+select pg_temp.care_assert(private.care_dashboard_start(7,'2026-09-12 12:00:00+00')='2026-09-06 04:00:00+00'::timestamptz,'Skipped midnight starts at first real local hour');
+reset role;insert into public.care_report_enrolments(patient_id,starts_on,ends_on,configured_by) values(pg_temp.id(2,1),(now() at time zone 'America/Santiago')::date-5,(now() at time zone 'America/Santiago')::date-1,pg_temp.id(1,5));
+set local role authenticated;select set_config('request.jwt.claim.sub',pg_temp.id(1,5)::text,true);
+select pg_temp.care_assert((public.care_dashboard()->'quality'->>'unconfigured_patients')::int=1,'Missing evening rule disclosed');
+select pg_temp.care_assert(public.care_dashboard()->'quality'->>'scheduler_verified'='false','Consultation never claims scheduled execution');
+select pg_temp.care_assert((public.care_dashboard()->'quality'->>'missing_windows')::int=1 and (public.care_dashboard()->'reports'->>'omitted')::int=1,'Missing generated window is disclosed without creating another patient omission');
+reset role;
+insert into public.care_intervention_requests(record_id,patient_id,source_revision,requested_by,body,due_at) values(pg_temp.id(4,1),pg_temp.id(2,1),1,pg_temp.id(1,3),'Solicitud QA',now()+interval '2 days');
+insert into public.care_events(id,title,kind,starts_at,ends_at,professional_id,modality,status,closed_at,created_by) select pg_temp.id(3,n),'Fuente paginada QA '||n,'individual',now()-interval '2 hours',now()-interval '1 hour',pg_temp.id(1,4),'in_person','completed',now()-interval '30 minutes',pg_temp.id(1,5) from generate_series(20,45)n;
+insert into public.care_event_participants(event_id,patient_id,attendance) select pg_temp.id(3,n),pg_temp.id(2,2),'present' from generate_series(20,45)n;
+set local role authenticated;select set_config('request.jwt.claim.sub',pg_temp.id(1,5)::text,true);
+select pg_temp.care_assert((public.care_dashboard()->>'requests')::int=1 and public.care_dashboard_patients()->'patients' @> '[{"request_due":null}]'::jsonb,'Pending intervention card counts only authorized open requests');
+select pg_temp.care_assert((public.care_dashboard_sources('attendance',30)->>'total')::int=31 and jsonb_array_length(public.care_dashboard_sources('attendance',30)->'rows')=25 and jsonb_array_length(public.care_dashboard_sources('attendance',30,'',2)->'rows')=6,'Sources are paginated without denominator truncation');
+select set_config('request.jwt.claim.sub',pg_temp.id(1,4)::text,true);
+select pg_temp.care_assert((public.care_dashboard()->>'requests')::int=0,'Professional without decision capability sees no intervention counts');
+select pg_temp.care_assert(public.care_dashboard_alerts()->'last_action'='null'::jsonb,'Other professional receives no foreign actor last-action metadata');
+reset role;update public.care_followup_reviews set color='green' where color='red';
+set local role authenticated;select set_config('request.jwt.claim.sub',pg_temp.id(1,5)::text,true);
+select pg_temp.care_assert(public.care_dashboard_patients('',1,'gray')->>'total'='2','Expired green becomes gray; no automatic green from absence of alerts');
+reset role;update public.care_assignments set ends_at=now() where professional_id=pg_temp.id(1,3);
+set local role authenticated;select set_config('request.jwt.claim.sub',pg_temp.id(1,3)::text,true);
+select pg_temp.care_assert((public.care_dashboard()->'attendance'->>'total')::int=0 and (public.care_dashboard_patients()->>'total')::int=0,'Revocation with existing JWT removes metrics and identity');
+select pg_temp.care_denied($$select public.care_followup_read(pg_temp.id(2,1))$$,'Revocation removes review history');
+reset role;update public.admin_users set is_active=false where user_id=pg_temp.id(1,5);
+set local role authenticated;select set_config('request.jwt.claim.sub',pg_temp.id(1,5)::text,true);
+select pg_temp.care_denied($$select public.care_dashboard()$$,'Suspended director cannot aggregate with prior JWT');
+reset role;
+select pg_temp.care_assert(not exists(select 1 from private.care_audit where actor_id::text like 'c1000000-%' and to_jsonb(care_audit)::text like '%Valoración neutral QA%'),'Audit excludes manual clinical reason');
+rollback;

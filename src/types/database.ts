@@ -1,6 +1,8 @@
 /** Supabase database contract synchronized from the linked public schema on 2026-09-29. */
 import type { CmsTables } from "./cms";
-export type AdminRole = "superadmin" | "editor" | "viewer";
+import type { PatientLibraryFunctions, PatientLibraryTables } from "./patient-library";
+import type { CareFunctions, CareTables } from "./care";
+export type AdminRole = "superadmin" | "editor" | "viewer" | "psychologist" | "psychiatrist" | "recovery_coach";
 export type ContactSubmissionStatus = "new" | "in_progress" | "closed" | "spam";
 export type ContentKind = "blog" | "news";
 export type ContentStatus = "draft" | "published" | "archived";
@@ -11,7 +13,7 @@ export type Json = string | number | boolean | null | { [key: string]: Json | un
 export type Database = {
   __InternalSupabase: { PostgrestVersion: "14.5" };
   public: {
-    Tables: CmsTables & {
+    Tables: CmsTables & PatientLibraryTables & CareTables & {
       admin_users: {
         Row: { user_id: string; role: AdminRole; is_active: boolean; created_at: string; updated_at: string };
         Insert: { user_id: string; role?: AdminRole; is_active?: boolean; created_at?: string; updated_at?: string };
@@ -65,7 +67,16 @@ export type Database = {
       };
     };
     Views: Record<never, never>;
-    Functions: {
+    Functions: PatientLibraryFunctions & CareFunctions & {
+      demo_status: { Args: Record<never, never>; Returns: Json };
+      demo_begin: { Args: { actor: string }; Returns: string };
+      demo_register_account: { Args: { bid: string; slot_name: string; uid: string }; Returns: undefined };
+      demo_service_state: { Args: { bid: string }; Returns: Json };
+      demo_seed: { Args: { bid: string }; Returns: Json };
+      demo_file: { Args: { bid: string; mid: string; file_bytes: number }; Returns: Json };
+      demo_activate: { Args: { bid: string }; Returns: undefined };
+      demo_remove_data: { Args: { bid: string }; Returns: Json };
+      demo_finish_removal: { Args: { bid: string }; Returns: undefined };
       save_cms_page: { Args: { p_page: Json }; Returns: string };
       create_editorial_page: { Args: { p_title: string; p_path: string }; Returns: string };
       withdraw_editorial_page: { Args: { p_id: string; p_base_updated_at: string; p_draft_updated_at: string | null }; Returns: string };

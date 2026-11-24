@@ -20,6 +20,6 @@ export const contentPostSchema = z.object({
 });
 export const consultationStatusSchema = z.enum(["new", "in_progress", "closed", "spam"]);
 export const noteSchema = z.string().trim().min(1).max(2_000).refine((value) => !/[<>]/.test(value), "Las notas no admiten HTML.");
-export const staffInviteSchema = z.object({ email: z.email().trim().toLowerCase(), role: z.enum(["superadmin", "editor", "viewer"]) });
-export const staffUpdateSchema = z.object({ userId: z.string().uuid(), role: z.enum(["superadmin", "editor", "viewer"]), active: z.boolean() });
+export const staffInviteSchema = z.object({ email: z.email().trim().toLowerCase(), role: z.enum(["superadmin", "editor", "viewer", "psychologist", "psychiatrist", "recovery_coach"]) });
+export const staffUpdateSchema = z.object({ userId: z.string().uuid(), role: z.enum(["superadmin", "editor", "viewer", "psychologist", "psychiatrist", "recovery_coach"]), active: z.boolean() });
 export function formDataRecord(formData: FormData) { return Object.fromEntries(formData.entries()); }

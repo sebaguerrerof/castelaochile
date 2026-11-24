@@ -4,7 +4,7 @@ import { AdminPanel, PageHeader, StatusBadge } from "@/components/admin/admin-ui
 import { PasswordChangeForm } from "@/components/admin/password-change-form";
 import { requireAdmin } from "@/lib/auth/admin";
 
-const roleLabels = { editor: "Editor", superadmin: "Superadministrador", viewer: "Solo lectura" } as const;
+import { staffRoleLabels as roleLabels } from "@/lib/staff-roles";
 
 export default async function AdminProfilePage() {
   const admin = await requireAdmin();

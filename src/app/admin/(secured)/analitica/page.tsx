@@ -5,13 +5,20 @@ import { analyticsVariation } from "@/lib/analytics-report";
 import { requireAdmin } from "@/lib/auth/admin";
 import { getAnalytics } from "@/lib/repositories/admin-repository";
 import { isAnalyticsEnabled } from "@/lib/runtime-config";
+import { demoBatches } from "@/lib/demo/server";
+import Link from "next/link";
 
 const validPeriods = [7, 30, 90] as const;
 const formatTimestamp = (value: string) => new Intl.DateTimeFormat("es-CL", { dateStyle: "medium", timeStyle: "short", timeZone: "America/Santiago" }).format(new Date(value));
 
-export default async function AnalyticsPage({ searchParams }: { searchParams: Promise<{ period?: string }> }) {
+export default async function AnalyticsPage({ searchParams }: { searchParams: Promise<{ period?: string; demo?: string }> }) {
   await requireAdmin();
-  const { period } = await searchParams;
+  const { period, demo } = await searchParams;
+  if (demo) {
+    const batch = (await demoBatches()).find(b => b.id === demo && b.state === "active");
+    return <><PageHeader title="Analítica de muestra" eyebrow="DEMO · Cifras ficticias" description="Este gráfico permite presentar la interfaz. No representa visitas reales ni se incorpora a las métricas del sitio." actions={<Link className="admin-button admin-button-secondary" href="/admin/demostracion">Volver al recorrido</Link>} />
+      {batch ? <><AdminNotice tone="info">DEMO · Datos ficticios para la presentación al cliente.</AdminNotice><AdminPanel title="Actividad diaria de muestra" description="Vistas y navegadores diarios simulados durante siete días."><AnalyticsChart points={batch.analytics} /></AdminPanel></> : <StatePanel title="Demostración no disponible" description="Los ejemplos fueron retirados o aún no se ha terminado su carga." />}</>;
+  }
   const days = validPeriods.includes(Number(period) as typeof validPeriods[number]) ? Number(period) : 7;
   const enabled = isAnalyticsEnabled();
   const result = enabled ? await getAnalytics(days).catch(() => null) : null;

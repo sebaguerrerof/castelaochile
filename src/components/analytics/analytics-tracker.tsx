@@ -26,7 +26,7 @@ export function AnalyticsTracker({ initialConsent }: { initialConsent: "accepted
 
   useEffect(() => {
     if (consent !== "accepted") { lastView.current = null; activeRequests.current.forEach((request) => request.abort()); return; }
-    if (!pathname || pathname.startsWith("/admin") || pathname.startsWith("/api") || withdrawing.current) return;
+    if (!pathname || pathname.startsWith("/admin") || pathname.startsWith("/api") || /^\/(pacientes|auth)(\/|$)/i.test(pathname) || withdrawing.current) return;
     if (navigator.doNotTrack === "1" || (navigator as Navigator & { globalPrivacyControl?: boolean }).globalPrivacyControl) return;
     // Preserve one event ID through effect replays and retries; revisiting a route gets a new ID.
     if (lastView.current?.path !== pathname) lastView.current = { path: pathname, eventId: crypto.randomUUID() };
