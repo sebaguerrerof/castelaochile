@@ -18,7 +18,7 @@ export async function staffReportAction(_:CareFormState,form:FormData):Promise<C
     if(op==="rule")for(const key of ["fields","required_fields","weekdays"])input[key]=form.getAll(key);
     const p=(op==="review"?reportReviewSchema:reportConfigSchemas[op]).parse(input) as Json;
     const client=await createServerSupabaseClient();const result=op==="review"?await client.rpc("care_report_write",{op,p}):await client.rpc("care_report_configure",{op,p});
-    if(result.error)throw new Error(result.error.code==="40001"?"El registro cambió. Recarga antes de guardar.":"No fue posible guardar. Revisa permisos, fechas, ventana y configuración aprobada.");
+    if(result.error)throw new Error((result.error.code==="40001"||result.error.code==="PT409")?"El registro cambió. Recarga antes de guardar.":"No fue posible guardar. Revisa permisos, fechas, ventana y configuración aprobada.");
     revalidatePath("/admin/seguimiento","layout");revalidatePath("/pacientes","layout");
     return {status:"success",message:op==="review"?"Revisión registrada para esta versión.":"Configuración guardada.",savedAt:Date.now()};
   }catch(error){if(error instanceof z.ZodError)return {status:"error",message:"Revisa los campos señalados.",fieldErrors:careFieldErrors(error)};return {status:"error",message:error instanceof Error?error.message:"No fue posible guardar."};}

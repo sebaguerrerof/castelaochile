@@ -28,7 +28,7 @@ export async function personalAutonomyAction(pid: string | null, _: CareFormStat
     else if (op === "attest") p = z.object({id: z.uuid(), assessment_id: z.uuid(), revision: z.number().int().positive(), state: z.enum(["discussed", "differences", "pending"]), note: z.string().trim().max(2000), confirm: z.literal(true)}).strict().parse(p);
     else p = z.object({id: z.uuid(), assessment_id: z.uuid(), revision: z.number().int().positive(), body: z.string().trim().min(3).max(2000), shared: z.boolean()}).strict().parse(p);
     const {data: saved, error} = await client.rpc("care_pa_write", {pid: patient.id, op, p: p as Json});
-    if (error || !saved) return {status: "error", message: error?.code === "40001" ? "Hay una versión más reciente. Recarga antes de guardar; tus cambios siguen en pantalla." : "No se confirmó el guardado. Revisa los campos, la versión y los permisos. Tus cambios siguen en pantalla."};
+    if (error || !saved) return {status: "error", message: (error?.code === "40001" || error?.code === "PT409") ? "Hay una versión más reciente. Recarga antes de guardar; tus cambios siguen en pantalla." : "No se confirmó el guardado. Revisa los campos, la versión y los permisos. Tus cambios siguen en pantalla."};
     // A wizard must show the acknowledged save before refreshing its versioned
     // server props. Revalidating its layout here would unmount it mid-response.
     // These routes are force-dynamic; the explicit Continue refresh reads the save.

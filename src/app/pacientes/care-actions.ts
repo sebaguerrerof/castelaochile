@@ -17,7 +17,7 @@ export async function patientPlanningAction(_:CareFormState,form:FormData):Promi
     for(const key of ["planned_for","due_at"])if(key in input)input[key]=careLocalToUtc(input[key]);
     const p=planningSchemas[op].parse(input) as Json;
     const {error}=await client.rpc("care_planning_manage",{op,p});
-    if(error)throw new Error(error.code==="40001"?"El registro cambió. Recarga antes de guardar.":"No fue posible guardar. Comprueba los campos y tu acceso al registro.");
+    if(error)throw new Error((error.code==="40001"||error.code==="PT409")?"El registro cambió. Recarga antes de guardar.":"No fue posible guardar. Comprueba los campos y tu acceso al registro.");
     revalidatePath("/pacientes","layout");revalidatePath("/admin/seguimiento","layout");
     return {status:"success",message:"Guardado en tu planificación.",savedAt:Date.now()};
   }catch(error){if(error instanceof z.ZodError)return {status:"error",message:"Revisa los campos señalados.",fieldErrors:careFieldErrors(error)};return {status:"error",message:error instanceof Error?error.message:"No fue posible guardar."};}

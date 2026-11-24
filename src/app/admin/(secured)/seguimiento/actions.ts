@@ -21,7 +21,7 @@ export async function manageCare(_:CareFormState,form:FormData):Promise<CareForm
     for(const key of ["starts_at","started_at","effective_at"])if(key in input)input[key]=careLocalToUtc(input[key]);
     const p=careSchemas[op].parse(input) as Json;
     const client=await createServerSupabaseClient();const {error}=await client.rpc("care_manage",{op,p});
-    if(error)throw new Error(error.code==="40001"?"El registro cambió. Recarga antes de guardar.":"No fue posible guardar. Revisa los datos y la asignación del profesional.");
+    if(error)throw new Error((error.code==="40001"||error.code==="PT409")?"El registro cambió. Recarga antes de guardar.":"No fue posible guardar. Revisa los datos y la asignación del profesional.");
     revalidatePath("/admin/seguimiento","layout");revalidatePath("/pacientes","layout");
     return {status:"success",message:"Cambios guardados.",savedAt:Date.now()};
   } catch(error) {

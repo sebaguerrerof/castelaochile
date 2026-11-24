@@ -28,7 +28,7 @@ export async function staffRecordAction(_:CareFormState,form:FormData):Promise<C
    if(p.specialty==="recovery")for(const key of ["commitment_due_at","commitment_review_at"])rawPayload[key]=form.get(key)?careLocalToUtc(form.get(key)):"";
    const payload=validateClinicalPayload(p.specialty,rawPayload,final);
    const result=await client.rpc("care_record_write",{op,p:{...p,payload} as Json});
-   if(result.error)throw new Error(result.error.code==="40001"?"El registro cambió. Conserva tu texto y recarga antes de guardar.":result.error.code==="23505"?"Ya existe un registro de este tipo para esta sesión y profesional. Ábrelo desde la ficha.":"No fue posible guardar. Revisa sesión realizada, asistencia, permisos, campos y visibilidad.");
+   if(result.error)throw new Error((result.error.code==="40001"||result.error.code==="PT409")?"El registro cambió. Conserva tu texto y recarga antes de guardar.":result.error.code==="23505"?"Ya existe un registro de este tipo para esta sesión y profesional. Ábrelo desde la ficha.":"No fue posible guardar. Revisa sesión realizada, asistencia, permisos, campos y visibilidad.");
    // A new record navigates first: refreshing /nuevo would unmount its action state.
    if(p.version>0)revalidatePath("/admin/seguimiento","layout");revalidatePath("/pacientes","layout");
    return {status:"success",message:final?"Registro finalizado; original conservado.":"Borrador privado guardado.",savedAt:Date.now(),...(p.version===0?{nextPath:`/admin/seguimiento/pacientes/${p.patient_id}/registros/${p.id}`}:{})};

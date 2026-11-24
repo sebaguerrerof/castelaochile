@@ -20,7 +20,7 @@ export async function patientReportAction(_:CareFormState,form:FormData):Promise
     if(submit&&report&&p.reason.length<3)return {status:"error",message:"Registra un motivo de corrección.",fieldErrors:{reason:["Explica brevemente el cambio."]}};
     const answers=validateReportAnswers(obligation,Object.fromEntries(obligation.fields.map(f=>[f,form.get(f)??""])),submit);
     const result=await client.rpc("care_report_write",{op:submit?"submit":"draft",p:{...p,answers} as Json});
-    if(result.error)throw new Error(result.error.code==="40001"?"El reporte o borrador cambió. Conserva tu texto y recarga antes de guardar.":"No fue posible guardar. Conserva tu texto y revisa tu acceso o la ventana del reporte.");
+    if(result.error)throw new Error((result.error.code==="40001"||result.error.code==="PT409")?"El reporte o borrador cambió. Conserva tu texto y recarga antes de guardar.":"No fue posible guardar. Conserva tu texto y revisa tu acceso o la ventana del reporte.");
     revalidatePath("/pacientes","layout");revalidatePath("/admin/seguimiento","layout");
     return {status:"success",message:submit?"Reporte enviado al equipo.":"Borrador guardado. Aún no está enviado.",savedAt:Date.now()};
   }catch(error){if(error instanceof z.ZodError)return {status:"error",message:"Revisa los campos señalados.",fieldErrors:careFieldErrors(error)};return {status:"error",message:error instanceof Error?error.message:"No fue posible guardar. Conserva tu texto para reintentar."};}

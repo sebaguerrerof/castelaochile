@@ -13,7 +13,7 @@ export async function followupAction(_:CareFormState,form:FormData):Promise<Care
   const op=z.enum(["assessment","receive","resolve"]).parse(form.get("intent")??form.get("op"));
   const values=Object.fromEntries(form.entries());
   const p=op==="assessment"?assessmentSchema.parse({...values,occurred_at:careLocalToUtc(form.get("occurred_at")),review_at:careLocalToUtc(form.get("review_at")),confirm_approved:form.get("confirm_approved")==="on"}):alertActionSchema.parse(values);
-  const result=await client.rpc("care_followup_manage",{op,p});if(result.error)throw new Error(result.error.code==="40001"?"El seguimiento cambió. Conserva tu texto y recarga antes de guardar.":"No fue posible guardar. Revisa alcance, evidencia, fechas y estado actual.");
+  const result=await client.rpc("care_followup_manage",{op,p});if(result.error)throw new Error((result.error.code==="40001"||result.error.code==="PT409")?"El seguimiento cambió. Conserva tu texto y recarga antes de guardar.":"No fue posible guardar. Revisa alcance, evidencia, fechas y estado actual.");
   revalidatePath("/admin/seguimiento","layout");return {status:"success",message:op==="assessment"?"Valoración manual guardada; historial conservado.":op==="receive"?"Recepción registrada; la alerta continúa pendiente de resolución.":"Resolución registrada; origen e historial conservados.",savedAt:Date.now()};
  }catch(error){if(error instanceof z.ZodError)return {status:"error",message:"Revisa los campos señalados.",fieldErrors:careFieldErrors(error)};return {status:"error",message:error instanceof Error?error.message:"No fue posible guardar."};}
 }
