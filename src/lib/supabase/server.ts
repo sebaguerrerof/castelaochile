@@ -6,8 +6,10 @@ import { hasSupabasePublicConfig, supabasePublicConfig } from "@/lib/supabase/co
 import type { Database } from "@/types/database";
 
 export async function createServerSupabaseClient() {
-  if (!hasSupabasePublicConfig()) throw new RuntimeConfigurationError("Supabase");
+  // Read cookies first: it marks the route as dynamic even when Supabase is not configured, so a build
+  // without environment variables (CI) does not try to prerender pages that need the database.
   const cookieStore = await cookies();
+  if (!hasSupabasePublicConfig()) throw new RuntimeConfigurationError("Supabase");
   return createServerClient<Database>(supabasePublicConfig.url!, supabasePublicConfig.publishableKey!, {
     cookies: {
       getAll: () => cookieStore.getAll(),
