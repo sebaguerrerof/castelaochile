@@ -8,7 +8,7 @@ import { navigationItems } from "@/config/navigation";
 import { groupPublicNavigation, isPublicLinkActive } from "@/lib/public-navigation";
 import { whatsappHref } from "@/lib/contact-links";
 import type { NavigationItem } from "@/types/site";
-import { BrandLogo } from "@/components/shared/brand-logo";
+import { BrandMark } from "@/components/shared/brand-mark";
 import { WhatsAppIcon } from "@/components/shared/whatsapp-icon";
 import { Container } from "./container";
 
@@ -108,11 +108,11 @@ export function Header({ items = navigationItems, evaluationUrl = "/contacto", e
 
   return <header className={"public-header" + (compact ? " public-header--compact" : "")} ref={header}>
     <div className="public-header__utility"><Container>
-      <span>Instituto Castelao <span className="public-header__country">Chile</span></span>
-      {whatsappUrl && <a href={whatsappUrl} rel="noopener noreferrer" target="_blank"><WhatsAppIcon /> <span>Conversemos por WhatsApp</span><ArrowRight size={14} /></a>}
+      <p>Tratamiento ambulatorio especializado en adicciones</p>
+      {whatsappUrl && <a aria-label="Conversemos por WhatsApp" href={whatsappUrl} rel="noopener noreferrer" target="_blank"><WhatsAppIcon /> <span>Conversemos por WhatsApp</span></a>}
     </Container></div>
     <Container className="public-header__main">
-      <Link aria-label="Instituto Castelao Chile, ir al inicio" className="public-header__brand" href="/" onClick={() => setDropdown(null)}><BrandLogo priority /></Link>
+      <Link className="public-header__brand" href="/" onClick={() => setDropdown(null)}><BrandMark priority /></Link>
       <nav aria-label="Navegación principal" className="public-header__navigation">
         <ul>{groups.map((group) => {
           const active = group.items.some((item) => isPublicLinkActive(pathname, item.href));
@@ -129,7 +129,7 @@ export function Header({ items = navigationItems, evaluationUrl = "/contacto", e
     </Container>
     <dialog aria-label="Menú principal" className="public-mobile-menu" id="mobile-navigation" onClick={(event) => { if (event.target === event.currentTarget) closeMobile(); }} onClose={() => setMobileOpen(false)} onKeyDown={cycleMobileFocus} ref={dialog}>
       <div className="public-mobile-menu__inner">
-        <div className="public-mobile-menu__header"><BrandLogo /><button aria-label="Cerrar menú" className="public-header__toggle" onClick={closeMobile} type="button"><X size={24} /></button></div>
+        <div className="public-mobile-menu__header"><BrandMark territory={false} /><button aria-label="Cerrar menú" className="public-header__toggle" onClick={closeMobile} type="button"><X size={24} /></button></div>
         <nav aria-label="Navegación móvil"><Link className="public-mobile-link" href="/" onClick={closeMobile}>Inicio<ArrowRight size={16} /></Link>{groups.map((group) => group.items.length === 1 ? <Link aria-current={isPublicLinkActive(pathname, group.items[0].href) ? "page" : undefined} className="public-mobile-link" href={group.items[0].href} key={group.id} onClick={closeMobile}>{group.label}<ArrowRight size={16} /></Link> : <details className="public-mobile-group" key={group.id} open={group.items.some((item) => isPublicLinkActive(pathname, item.href))}><summary>{group.label}<ChevronDown size={18} /></summary><div>{group.items.map((item) => <Link aria-current={isPublicLinkActive(pathname, item.href) ? "page" : undefined} href={item.href} key={item.href} onClick={closeMobile}>{item.label}<ArrowRight size={15} /></Link>)}</div></details>)}</nav>
         <div className="public-mobile-menu__contact"><Link className="public-button public-button--primary" href={evaluationUrl} onClick={closeMobile}>{evaluationLabel}<ArrowRight size={16} /></Link>{whatsappUrl && <a className="public-mobile-menu__whatsapp" href={whatsappUrl} rel="noopener noreferrer" target="_blank"><WhatsAppIcon /> WhatsApp</a>}</div>
       </div>

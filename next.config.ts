@@ -20,12 +20,14 @@ const scriptSources = [
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  // The photographic heroes ask for quality 60; Next only honours qualities listed here.
+  images: { qualities: [60, 75] },
   experimental: { authInterrupts: true },
   async headers() {
     return [{
       source: "/:path*",
       headers: [
-        { key: "Content-Security-Policy", value: `default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src ${imageSources}; connect-src ${connectSources}; script-src ${scriptSources}; style-src 'self' 'unsafe-inline'; font-src 'self' data:; upgrade-insecure-requests` },
+        { key: "Content-Security-Policy", value: `default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; form-action 'self'; img-src ${imageSources}; connect-src ${connectSources}; script-src ${scriptSources}; style-src 'self' 'unsafe-inline'; font-src 'self' data:${process.env.NODE_ENV === "development" ? "" : "; upgrade-insecure-requests"}` },
         { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
         { key: "X-Content-Type-Options", value: "nosniff" },
         { key: "X-Frame-Options", value: "DENY" },

@@ -5,6 +5,7 @@ import { BlogGrid } from "@/components/content/blog-grid";
 import { BlogPagination } from "@/components/content/blog-pagination";
 import { BlogSearchControls } from "@/components/content/blog-search-controls";
 import { Container } from "@/components/layout/container";
+import { PageHero } from "@/components/shared/page-hero";
 import { createPageMetadata } from "@/lib/page-metadata";
 import { listBlogCategories, listBlogPosts } from "@/lib/repositories/content-repository";
 
@@ -48,13 +49,7 @@ export default async function BlogPage({ searchParams }: { searchParams: Promise
   if (page.totalPages > 0 && requestedPage > page.totalPages) redirect(blogHref({ query, category, page: page.totalPages }));
 
   return <>
-    <section className="blog-hero">
-      <Container>
-        <p className="eyebrow">Blog / Noticias</p>
-        <h1>Información para comprender, acompañar y avanzar</h1>
-        <p>Actualidad y recursos editoriales sobre adicciones, tratamiento y recuperación, integrados a la experiencia de Castelao Chile.</p>
-      </Container>
-    </section>
+    <PageHero current="Blog" description="Actualidad y recursos sobre adicciones, tratamiento y recuperación." title="Información para comprender, acompañar y avanzar" />
     <Container className="blog-page">
       <BlogSearchControls categories={categories} category={category} query={query} />
       <div aria-live="polite" className="blog-results-summary">{page.total > 0 ? <p><strong>{page.total}</strong> {page.total === 1 ? "artículo" : "artículos"}{query ? ` para “${query}”` : ""}</p> : <p>Sin resultados</p>}</div>

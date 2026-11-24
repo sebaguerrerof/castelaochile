@@ -21,11 +21,6 @@
 @media (min-width: 768px) { .public-content-list { padding: 4rem 0; } }
 
 /* Native Castelao Chile blog experience. */
-.blog-hero { overflow: hidden; position: relative; background: linear-gradient(125deg, var(--brand-blue-deep), var(--primary) 62%, var(--brand-blue-bright)); color: var(--primary-foreground); padding: clamp(4rem, 9vw, 7.5rem) 0; }
-.blog-hero::after { position: absolute; top: -17rem; right: -12rem; width: 34rem; height: 34rem; border: 1px solid rgb(255 255 255 / 22%); border-radius: 999px; box-shadow: 0 0 0 5rem rgb(255 255 255 / 4%), 0 0 0 10rem rgb(255 255 255 / 3%); content: ""; }
-.blog-hero .eyebrow { color: rgb(255 255 255 / 72%); }
-.blog-hero h1 { position: relative; z-index: 1; max-width: 53rem; margin-top: .8rem; font-family: var(--font-heading); font-size: clamp(2.5rem, 7vw, 5.3rem); font-weight: 700; letter-spacing: -.05em; line-height: .98; }
-.blog-hero p:not(.eyebrow) { position: relative; z-index: 1; max-width: 45rem; margin-top: 1.25rem; color: rgb(255 255 255 / 82%); font-size: clamp(1rem, 2.2vw, 1.2rem); line-height: 1.65; }
 .blog-page { padding-top: 2rem; padding-bottom: 5rem; }
 .blog-controls { position: relative; z-index: 2; margin-top: -4.2rem; border: 1px solid var(--border); border-radius: var(--radius-xl); background: var(--surface); box-shadow: var(--shadow-soft); padding: 1rem; }
 .blog-search { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: .75rem; }
@@ -128,7 +123,6 @@
 .related-posts h2 { margin-top: .6rem; font-family: var(--font-heading); font-size: clamp(2rem, 5vw, 3rem); letter-spacing: -.04em; }
 
 .blog-skeleton { display: block; overflow: hidden; border-radius: .4rem; background: linear-gradient(100deg, var(--surface-muted) 20%, color-mix(in srgb, var(--surface-muted) 55%, var(--surface)) 40%, var(--surface-muted) 60%); background-size: 220% 100%; animation: blog-skeleton-shimmer 1.4s linear infinite; }
-.blog-hero--skeleton { min-height: 25rem; }
 .blog-skeleton--eyebrow { width: 8rem; height: .8rem; }
 .blog-skeleton--title { width: min(46rem, 90%); height: clamp(3rem, 9vw, 5.5rem); margin-top: 1rem; }
 .blog-skeleton--copy { width: min(38rem, 80%); height: 1.2rem; margin-top: 1.2rem; }

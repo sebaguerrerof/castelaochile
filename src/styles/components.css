@@ -1,0 +1,174 @@
+/*
+ * Base components of the design system. Every value comes from tokens.css.
+ * One block per component; variants are modifier classes (ds-card--soft).
+ * Elevation is declared once per component: either a border or a shadow, never both.
+ */
+
+/* ---- TextLink ---- */
+.ds-text-link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--brand-blue);
+  font-family: var(--font-nav);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  letter-spacing: var(--tracking-ui);
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, currentColor 35%, transparent);
+  text-underline-offset: 0.3em;
+  transition: text-decoration-color var(--motion-fast) var(--ease-emphasized);
+}
+
+.ds-text-link:hover {
+  text-decoration-color: currentColor;
+}
+
+/* ---- Card ---- */
+.ds-card {
+  display: block;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--foreground);
+  padding: var(--space-5);
+}
+
+.ds-card--soft {
+  border-color: transparent;
+  background: var(--surface-muted);
+}
+
+a.ds-card {
+  transition: border-color var(--motion-fast) var(--ease-emphasized);
+}
+
+a.ds-card:hover {
+  border-color: var(--primary);
+}
+
+/* ---- Photo ---- */
+.ds-photo {
+  margin: 0;
+}
+
+.ds-photo__image {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: var(--radius);
+  object-fit: cover;
+}
+
+.ds-photo__caption {
+  margin-top: var(--space-3);
+  color: var(--foreground);
+  font-family: var(--font-gallery);
+  font-size: var(--text-sm);
+  line-height: var(--leading-body);
+}
+
+/* ---- Quote ---- */
+.ds-quote {
+  max-width: var(--measure);
+  margin: 0;
+  color: var(--foreground);
+  font-family: var(--font-quote);
+  font-size: var(--text-lg);
+  line-height: var(--leading-heading);
+}
+
+.ds-quote__cite {
+  display: block;
+  margin-top: var(--space-3);
+  color: var(--foreground);
+  font-family: var(--font-nav);
+  font-size: var(--text-sm);
+  font-style: normal;
+}
+
+/* ---- Notice: full border + tint + leading icon, never a side bar ---- */
+.ds-notice {
+  display: flex;
+  gap: var(--space-4);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface-muted);
+  color: var(--foreground);
+  padding: var(--space-4) var(--space-5);
+}
+
+.ds-notice--warning {
+  border-color: var(--brand-orange);
+  background: color-mix(in srgb, var(--brand-orange) 10%, var(--surface));
+}
+
+.ds-notice__icon {
+  flex: none;
+  margin-top: 0.15em;
+  color: var(--brand-blue);
+}
+
+.ds-notice--warning .ds-notice__icon {
+  color: var(--accent-foreground);
+}
+
+.ds-notice__title {
+  margin: 0 0 var(--space-1);
+  font-family: var(--font-heading);
+  font-size: var(--text-md);
+  line-height: var(--leading-heading);
+}
+
+.ds-notice__body {
+  max-width: var(--measure);
+  margin: 0;
+  font-size: var(--text-base);
+  line-height: var(--leading-body);
+}
+
+/* ---- EyeMark: the logo's eye (orange centre, blue ring) as a small marker ---- */
+.ds-eye {
+  display: inline-block;
+  flex: none;
+  width: 0.9em;
+  height: 0.9em;
+  border: 0.22em solid var(--brand-blue);
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+/* ---- BrandMark: the manual's hand plus the name as text, for the navigation bar ---- */
+.ds-brand-mark {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  color: var(--brand-blue);
+}
+
+.ds-brand-mark__hand {
+  display: block;
+  width: auto;
+  height: 2.75rem;
+}
+
+.ds-brand-mark__name {
+  font-family: var(--font-heading);
+  font-size: var(--text-lg);
+  font-weight: 700;
+  letter-spacing: var(--tracking-heading);
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.ds-brand-mark__territory {
+  border-left: 1px solid var(--border);
+  padding-left: var(--space-3);
+  color: var(--foreground);
+  font-family: var(--font-nav);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  line-height: 1;
+  text-transform: uppercase;
+}

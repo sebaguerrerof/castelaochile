@@ -11,23 +11,47 @@ export type LocalBrandAsset = {
   alt: string;
   width: number;
   height: number;
-  status: "manual-derived-preview";
+  status: "manual-extracted";
 };
 
 /**
  * Single source for public local assets. The four photos are optimized copies
  * intended for local review only; their publishing approval remains pending.
- * The horizontal mark is an unmodified high-resolution crop of the official
- * art on page 6 of the supplied manual, not a replacement master file.
+ * The logos are the original raster art embedded in the supplied brand manual
+ * (pages 5 and 6), extracted at native resolution with their transparency and
+ * with only the empty transparent margin trimmed. They are not redrawn or
+ * recolored; replace them if the agency supplies vector masters.
  */
 export const assets = {
   brand: {
     horizontal: {
-      src: "/brand/instituto-castelao-horizontal-manual-preview.png",
+      src: "/brand/instituto-castelao-horizontal.png",
       alt: "Logotipo Instituto Castelao",
-      width: 2880,
-      height: 595,
-      status: "manual-derived-preview",
+      width: 2669,
+      height: 357,
+      status: "manual-extracted",
+    } satisfies LocalBrandAsset,
+    mark: {
+      src: "/brand/instituto-castelao-mano.png",
+      alt: "",
+      width: 570,
+      height: 656,
+      status: "manual-extracted",
+    } satisfies LocalBrandAsset,
+    /** "Negativo / sobre fondo azul corporativo" (manual p. 16): white artwork, the eye stays transparent. */
+    verticalNegative: {
+      src: "/brand/instituto-castelao-vertical-negativo.png",
+      alt: "Logotipo Instituto Castelao",
+      width: 1409,
+      height: 765,
+      status: "manual-extracted",
+    } satisfies LocalBrandAsset,
+    vertical: {
+      src: "/brand/instituto-castelao-vertical.png",
+      alt: "Logotipo Instituto Castelao",
+      width: 1754,
+      height: 913,
+      status: "manual-extracted",
     } satisfies LocalBrandAsset,
   },
   images: {

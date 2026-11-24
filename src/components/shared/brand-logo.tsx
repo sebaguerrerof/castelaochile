@@ -7,32 +7,36 @@ type BrandLogoProps = {
   className?: string;
   priority?: boolean;
   placement?: "header" | "footer";
+  /** `vertical` is the primary logo; `horizontal` is the secondary one (admin). */
+  variant?: "horizontal" | "vertical" | "verticalNegative";
 };
 
 /**
- * Uses the derived manual preview asset only. It deliberately does not rebuild
- * the wordmark with web fonts; replace this source when the master brand files
- * arrive.
+ * Renders the logo extracted from the brand manual. It deliberately does not
+ * rebuild the wordmark with web fonts and never stretches the image: only the
+ * width is set in CSS, so the aspect ratio is preserved.
  */
 export function BrandLogo({
   className,
   priority = false,
   placement = "header",
+  variant = "horizontal",
 }: BrandLogoProps) {
-  const logo = assets.brand.horizontal;
+  const logo = assets.brand[variant];
+  const shape = variant === "verticalNegative" ? "vertical" : variant;
 
   return (
-    <span className={cn("brand-logo", `brand-logo--${placement}`, className)}>
+    <span className={cn("brand-logo", `brand-logo--${placement}`, `brand-logo--${shape}`, className)}>
       <Image
         alt={logo.alt}
         className="brand-logo__asset"
         height={logo.height}
         preload={priority}
-        sizes={placement === "header" ? "(max-width: 640px) 190px, 236px" : "210px"}
+        sizes={shape === "vertical" ? "(max-width: 640px) 80vw, 352px" : placement === "header" ? "(max-width: 640px) 190px, 236px" : "210px"}
         src={logo.src}
         width={logo.width}
       />
-      <span className="brand-logo__territory">Chile</span>
+      {variant === "horizontal" && <span className="brand-logo__territory">Chile</span>}
     </span>
   );
 }
