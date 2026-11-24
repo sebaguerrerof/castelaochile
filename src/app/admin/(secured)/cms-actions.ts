@@ -20,7 +20,8 @@ function payload(form: FormData): unknown {
   try { return JSON.parse(raw); } catch { return null; }
 }
 function editorialError(code?: string): AdminActionState {
-  return { status: "error", message: code === "40001" ? "Otra persona modificó el contenido o su borrador. Recarga antes de guardar." : code === "23505" ? "La ruta o el identificador ya está en uso." : "No se guardaron los cambios. Revisa los campos y tu sesión." };
+  // PT409 is the non-retryable conflict code (PostgREST 14 retries 40001 forever); 40001 stays for older functions.
+  return { status: "error", message: code === "PT409" || code === "40001" ? "Otra persona modificó el contenido o su borrador. Recarga antes de guardar." : code === "23505" ? "La ruta o el identificador ya está en uso." : "No se guardaron los cambios. Revisa los campos y tu sesión." };
 }
 export async function createEditorialPage(_state: AdminActionState, form: FormData): Promise<AdminActionState> {
   await requireAdmin(["editor", "superadmin"]);
