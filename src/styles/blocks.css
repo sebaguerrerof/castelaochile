@@ -791,7 +791,8 @@
 @media (max-width: 767px) {
   .cms-page .cms-hero + .cms-section--rich_text[data-variant="lead"] { margin-top: calc(-1 * var(--space-6)); }
   .cms-page [data-variant="lead"] .article-body { grid-template-columns: 1fr; }
-  .cms-page [data-variant="panel"] .cms-editorial { grid-template-columns: 1fr; }
+  /* Same specificity as the desktop rule above, otherwise the two columns survive on phones */
+  .cms-page .cms-section--rich_text[data-variant="panel"] .cms-editorial { grid-template-columns: 1fr; align-items: start; }
   .cms-page [data-variant="panel"] .cms-section-content { order: 0; }
 }
 
