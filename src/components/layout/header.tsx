@@ -7,6 +7,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { navigationItems } from "@/config/navigation";
 import { groupPublicNavigation, isPublicLinkActive } from "@/lib/public-navigation";
 import { whatsappHref } from "@/lib/contact-links";
+import { isExternalHref } from "@/lib/external-link";
 import type { NavigationItem } from "@/types/site";
 import { BrandMark } from "@/components/shared/brand-mark";
 import { WhatsAppIcon } from "@/components/shared/whatsapp-icon";
@@ -124,15 +125,21 @@ export function Header({ items = navigationItems, evaluationUrl = "/contacto", e
           </li>;
         })}</ul>
       </nav>
-      <Link className="public-button public-button--primary public-header__cta" href={evaluationUrl}>{evaluationLabel}<ArrowRight size={16} /></Link>
+      <EvaluationLink className="public-button public-button--primary public-header__cta" href={evaluationUrl} label={evaluationLabel} />
       <button aria-controls="mobile-navigation" aria-expanded={mobileOpen} aria-label="Abrir menú" className="public-header__toggle" id="mobile-menu-toggle" onClick={openMobile} type="button"><Menu size={24} /><span>Menú</span></button>
     </Container>
     <dialog aria-label="Menú principal" className="public-mobile-menu" id="mobile-navigation" onClick={(event) => { if (event.target === event.currentTarget) closeMobile(); }} onClose={() => setMobileOpen(false)} onKeyDown={cycleMobileFocus} ref={dialog}>
       <div className="public-mobile-menu__inner">
         <div className="public-mobile-menu__header"><BrandMark territory={false} /><button aria-label="Cerrar menú" className="public-header__toggle" onClick={closeMobile} type="button"><X size={24} /></button></div>
         <nav aria-label="Navegación móvil"><Link className="public-mobile-link" href="/" onClick={closeMobile}>Inicio<ArrowRight size={16} /></Link>{groups.map((group) => group.items.length === 1 ? <Link aria-current={isPublicLinkActive(pathname, group.items[0].href) ? "page" : undefined} className="public-mobile-link" href={group.items[0].href} key={group.id} onClick={closeMobile}>{group.label}<ArrowRight size={16} /></Link> : <details className="public-mobile-group" key={group.id} open={group.items.some((item) => isPublicLinkActive(pathname, item.href))}><summary>{group.label}<ChevronDown size={18} /></summary><div>{group.items.map((item) => <Link aria-current={isPublicLinkActive(pathname, item.href) ? "page" : undefined} href={item.href} key={item.href} onClick={closeMobile}>{item.label}<ArrowRight size={15} /></Link>)}</div></details>)}</nav>
-        <div className="public-mobile-menu__contact"><Link className="public-button public-button--primary" href={evaluationUrl} onClick={closeMobile}>{evaluationLabel}<ArrowRight size={16} /></Link>{whatsappUrl && <a className="public-mobile-menu__whatsapp" href={whatsappUrl} rel="noopener noreferrer" target="_blank"><WhatsAppIcon /> WhatsApp</a>}</div>
+        <div className="public-mobile-menu__contact"><EvaluationLink className="public-button public-button--primary" href={evaluationUrl} label={evaluationLabel} onClick={closeMobile} />{whatsappUrl && <a className="public-mobile-menu__whatsapp" href={whatsappUrl} rel="noopener noreferrer" target="_blank"><WhatsAppIcon /> WhatsApp</a>}</div>
       </div>
     </dialog>
   </header>;
+}
+
+/** The evaluation button: a route of this site, or an external scheduler opened in a new tab (announced to screen readers). */
+function EvaluationLink({ className, href, label, onClick }: { className: string; href: string; label: string; onClick?: () => void }) {
+  if (isExternalHref(href)) return <a className={className} href={href} onClick={onClick} rel="noopener noreferrer" target="_blank">{label}<ArrowRight aria-hidden="true" size={16} /><span className="sr-only"> (se abre en una pestaña nueva)</span></a>;
+  return <Link className={className} href={href} onClick={onClick}>{label}<ArrowRight size={16} /></Link>;
 }
